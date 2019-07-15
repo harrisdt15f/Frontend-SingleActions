@@ -15,7 +15,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class FrontendAuthLoginAction
 {
     use AuthenticatesUsers;
-
     /**
      * Login user and create token
      * @param  FrontendApiMainController  $contll
