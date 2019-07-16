@@ -34,7 +34,7 @@ class HompageActivityAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $activityEloq = $this->model::select('show_num', 'status')->where('en_name', 'activity')->first();
-        if (is_null($activityEloq) || $activityEloq->status !== 1) {
+        if ($activityEloq === null || $activityEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
         if (Cache::has('homepage_activity')) {

@@ -35,7 +35,7 @@ class HompageNoticeAction
     public function execute(FrontendApiMainController $contll, $input): JsonResponse
     {
         $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
-        if (is_null($noticeEloq) || $noticeEloq->status !== 1) {
+        if ($noticeEloq === null || $noticeEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
         if (Cache::has('homepage_notice')) {
