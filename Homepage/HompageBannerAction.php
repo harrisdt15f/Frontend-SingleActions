@@ -38,8 +38,8 @@ class HompageBannerAction
         if (is_null($status) || $status->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('homepageBanner')) {
-            $datas = Cache::get('homepageBanner');
+        if (Cache::has('homepage_banner')) {
+            $datas = Cache::get('homepage_banner');
         } else {
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url',
                 'activity_id')
@@ -55,7 +55,7 @@ class HompageBannerAction
                 }
                 unset($datas[$key]['activity'], $datas[$key]['activity_id']);
             }
-            Cache::forever('homepageBanner', $datas);
+            Cache::forever('homepage_banner', $datas);
         }
         return $contll->msgOut(true, $datas);
     }

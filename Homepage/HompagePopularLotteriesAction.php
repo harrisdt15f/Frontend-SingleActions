@@ -38,8 +38,8 @@ class HompagePopularLotteriesAction
         if (is_null($lotteriesEloq) || $lotteriesEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('popularLotteries')) {
-            $datas = Cache::get('popularLotteries');
+        if (Cache::has('popular_lotteries')) {
+            $datas = Cache::get('popular_lotteries');
         } else {
             $dataEloq = FrontendLotteryRedirectBetList::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
                 $query->select('id', 'day_issue', 'en_name');
@@ -50,7 +50,7 @@ class HompagePopularLotteriesAction
                 $datas[$key]['pic_path'] = $dataIthem->pic_path;
                 $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
             }
-            Cache::forever('popularLotteries', $datas);
+            Cache::forever('popular_lotteries', $datas);
         }
         return $contll->msgOut(true, $datas);
     }

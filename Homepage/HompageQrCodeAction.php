@@ -32,15 +32,15 @@ class HompageQrCodeAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        if (Cache::has('homepageQrCode')) {
-            $data = Cache::get('homepageQrCode');
+        if (Cache::has('homepage_qrcode')) {
+            $data = Cache::get('homepage_qrcode');
         } else {
             $data = $this->model::select('value', 'status')->where('en_name', 'qr.code')->first()->toArray();
             if ($data['status'] !== 1) {
                 return $contll->msgOut(false, [], '100400');
             }
             unset($data['status']);
-            Cache::forever('homepageQrCode', $data);
+            Cache::forever('homepage_qrcode', $data);
         }
         return $contll->msgOut(true, $data);
     }

@@ -37,11 +37,11 @@ class HompageActivityAction
         if (is_null($activityEloq) || $activityEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('homepageActivity')) {
-            $data = Cache::get('homepageActivity');
+        if (Cache::has('homepage_activity')) {
+            $data = Cache::get('homepage_activity');
         } else {
             $data = FrontendActivityContent::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
-            Cache::forever('homepageActivity', $data);
+            Cache::forever('homepage_activity', $data);
         }
         return $contll->msgOut(true, $data);
     }

@@ -37,8 +37,8 @@ class HompagePopularMethodsAction
         if (is_null($lotteriesEloq) || $lotteriesEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('popularMethods')) {
-            $datas = Cache::get('popularMethods');
+        if (Cache::has('popular_methods')) {
+            $datas = Cache::get('popular_methods');
         } else {
             $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
             $datas = [];
@@ -51,7 +51,7 @@ class HompagePopularMethodsAction
                 ];
                 $datas[] = $data;
             }
-            Cache::forever('popularMethods', $datas);
+            Cache::forever('popular_methods', $datas);
         }
         return $contll->msgOut(true, $datas);
     }

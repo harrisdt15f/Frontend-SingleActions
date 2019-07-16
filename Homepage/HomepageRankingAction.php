@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @Author: Fish
- * @Date:   2019-07-3 14:35:55
- */
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -31,16 +27,16 @@ class HomepageRankingAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $status = FrontendAllocatedModel::select('status')->where('en_name', 'winning.ranking')->first();
-        if (is_null($status) || $status->status !== 1) {
+        $rankingEloq = FrontendAllocatedModel::select('status', 'show_num')->where('en_name', 'winning.ranking')->first();
+        if (is_null($rankingEloq) || $rankingEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('homepageRanking')) {
-            $rankingE = Cache::get('homepageRanking');
+        if (Cache::has('homepage_ranking')) {
+            $rankingData = Cache::get('homepage_ranking');
         } else {
-            $rankingE = $this->model::select('username', 'lottery_sign', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit(100)->get()->toArray();
-            Cache::forever('homepageRanking', $rankingE);
+            $rankingData = $this->model::select('username', 'lottery_sign', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit($rankingEloq->show_num)->get()->toArray();
+            Cache::forever('homepage_ranking', $rankingData);
         }
-        return $contll->msgOut(true, $rankingE);
+        return $contll->msgOut(true, $rankingData);
     }
 }

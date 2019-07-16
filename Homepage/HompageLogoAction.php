@@ -32,15 +32,15 @@ class HompageLogoAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        if (Cache::has('homepageLogo')) {
-            $data = Cache::get('homepageLogo');
+        if (Cache::has('homepage_logo')) {
+            $data = Cache::get('homepage_logo');
         } else {
             $logoEloq = $this->model::select('value', 'status')->where('en_name', 'logo')->first();
             if (is_null($logoEloq) || $logoEloq->status !== 1) {
                 return $contll->msgOut(false, [], '100400');
             }
             $data['value'] = $logoEloq->value;
-            Cache::forever('homepageLogo', $data);
+            Cache::forever('homepage_logo', $data);
         }
         return $contll->msgOut(true, $data);
     }

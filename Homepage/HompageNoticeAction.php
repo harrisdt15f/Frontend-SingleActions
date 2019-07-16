@@ -38,8 +38,8 @@ class HompageNoticeAction
         if (is_null($noticeEloq) || $noticeEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('homepageNotice')) {
-            $data = Cache::get('homepageNotice');
+        if (Cache::has('homepage_notice')) {
+            $data = Cache::get('homepage_notice');
         } else {
             $eloqM = new FrontendMessageNotice();
             $searchAbleFields = [
@@ -49,7 +49,7 @@ class HompageNoticeAction
             $contll->inputs['status'] = 1;
             $contll->inputs['type'] = $input;
             $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'sort', $orderFlow = 'asc');
-            Cache::forever('homepageNotice', $data);
+            Cache::forever('homepage_notice', $data);
         }
         return $contll->msgOut(true, $data);
     }

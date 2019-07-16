@@ -32,15 +32,15 @@ class HompageIcoAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        if (Cache::has('homepageIco')) {
-            $data = Cache::get('homepageIco');
+        if (Cache::has('homepage_ico')) {
+            $data = Cache::get('homepage_ico');
         } else {
             $icoEloq = $this->model::select('value', 'status')->where('en_name', 'frontend.ico')->first();
             if (is_null($icoEloq) || $icoEloq->status !== 1) {
                 return $contll->msgOut(false, [], '100400');
             }
             $data = $icoEloq->value;
-            Cache::forever('homepageIco', $data);
+            Cache::forever('homepage_ico', $data);
         }
         return $contll->msgOut(true, $data);
     }
