@@ -28,7 +28,7 @@ class HomepageRankingAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $rankingEloq = FrontendAllocatedModel::select('status', 'show_num')->where('en_name', 'winning.ranking')->first();
-        if (is_null($rankingEloq) || $rankingEloq->status !== 1) {
+        if ($rankingEloq === null || $rankingEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
         if (Cache::has('homepage_ranking')) {

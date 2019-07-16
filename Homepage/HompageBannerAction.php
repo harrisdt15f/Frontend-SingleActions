@@ -35,7 +35,7 @@ class HompageBannerAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
-        if (is_null($status) || $status->status !== 1) {
+        if ($status === null || $status->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
         if (Cache::has('homepage_banner')) {

@@ -36,7 +36,7 @@ class HompageLogoAction
             $data = Cache::get('homepage_logo');
         } else {
             $logoEloq = $this->model::select('value', 'status')->where('en_name', 'logo')->first();
-            if (is_null($logoEloq) || $logoEloq->status !== 1) {
+            if ($logoEloq === null || $logoEloq->status !== 1) {
                 return $contll->msgOut(false, [], '100400');
             }
             $data['value'] = $logoEloq->value;
