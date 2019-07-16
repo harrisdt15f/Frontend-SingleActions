@@ -33,13 +33,13 @@ class HompagePopularMethodsAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
+        $lotteriesEloq = $this->model::select('show_num', 'status')->where('en_name', 'popularLotteries.two')->first();
+        if (is_null($lotteriesEloq) || $lotteriesEloq->status !== 1) {
+            return $contll->msgOut(false, [], '100400');
+        }
         if (Cache::has('popularMethods')) {
             $datas = Cache::get('popularMethods');
         } else {
-            $lotteriesEloq = $this->model::select('show_num', 'status')->where('en_name', 'popularLotteries.two')->first();
-            if ($lotteriesEloq->status !== 1) {
-                return $contll->msgOut(false, [], '100400');
-            }
             $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
             $datas = [];
             foreach ($methodsEloq as $method) {

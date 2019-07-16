@@ -36,11 +36,7 @@ class HompageIcoAction
             $data = Cache::get('homepageIco');
         } else {
             $icoEloq = $this->model::select('value', 'status')->where('en_name', 'frontend.ico')->first();
-            if ($icoEloq === null) {
-                //#######################################################
-                return $contll->msgOut(false, [], '100400');
-            }
-            if ($icoEloq->status !== 1) {
+            if (is_null($icoEloq) || $icoEloq->status !== 1) {
                 return $contll->msgOut(false, [], '100400');
             }
             $data = $icoEloq->value;

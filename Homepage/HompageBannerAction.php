@@ -34,13 +34,13 @@ class HompageBannerAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
+        $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
+        if (is_null($status) || $status->status !== 1) {
+            return $contll->msgOut(false, [], '100400');
+        }
         if (Cache::has('homepageBanner')) {
             $datas = Cache::get('homepageBanner');
         } else {
-            $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
-            if ($status->status !== 1) {
-                return $contll->msgOut(false, [], '100400');
-            }
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url',
                 'activity_id')
                 ->with([

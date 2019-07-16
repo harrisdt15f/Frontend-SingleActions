@@ -31,14 +31,14 @@ class HomepageRankingAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
+        $status = FrontendAllocatedModel::select('status')->where('en_name', 'winning.ranking')->first();
+        if (is_null($status) || $status->status !== 1) {
+            return $contll->msgOut(false, [], '100400');
+        }
         if (Cache::has('homepageRanking')) {
             $rankingE = Cache::get('homepageRanking');
         } else {
-            $status = FrontendAllocatedModel::select('status')->where('en_name', 'winning.ranking')->first();
-            if ($status->status !== 1) {
-                return $contll->msgOut(false, [], '100400');
-            }
-            $rankingE = $this->model::select('username', 'bonus')->where('bonus','>', '0')->orderBy('bonus','DESC')->limit(100)->get()->toArray();
+            $rankingE = $this->model::select('username', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit(100)->get()->toArray();
             Cache::forever('homepageRanking', $rankingE);
         }
         return $contll->msgOut(true, $rankingE);

@@ -32,23 +32,19 @@ class HompageNoticeAction
      * @param $input
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll,$input): JsonResponse
+    public function execute(FrontendApiMainController $contll, $input): JsonResponse
     {
+        $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
+        if (is_null($noticeEloq) || $noticeEloq->status !== 1) {
+            return $contll->msgOut(false, [], '100400');
+        }
         if (Cache::has('homepageNotice')) {
             $data = Cache::get('homepageNotice');
         } else {
-            $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
-            if ($noticeEloq === null) {
-                //#######################################################
-                return $contll->msgOut(false, [], '100400');
-            }
-            if ($noticeEloq->status !== 1) {
-                return $contll->msgOut(false, [], '100400');
-            }
             $eloqM = new FrontendMessageNotice();
             $searchAbleFields = [
                 'type',
-                'status'
+                'status',
             ];
             $contll->inputs['status'] = 1;
             $contll->inputs['type'] = $input;
