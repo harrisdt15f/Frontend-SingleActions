@@ -38,7 +38,7 @@ class HomepageRankingAction
         if (Cache::has('homepageRanking')) {
             $rankingE = Cache::get('homepageRanking');
         } else {
-            $rankingE = $this->model::select('username', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit(100)->get()->toArray();
+            $rankingE = $this->model::select('username', 'lottery_sign', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit(100)->get()->toArray();
             Cache::forever('homepageRanking', $rankingE);
         }
         return $contll->msgOut(true, $rankingE);
