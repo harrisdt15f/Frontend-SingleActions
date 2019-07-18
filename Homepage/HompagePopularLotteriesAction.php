@@ -34,23 +34,10 @@ class HompagePopularLotteriesAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $lotteriesEloq = $this->model::select('show_num', 'status')->where('en_name', 'popularLotteries.one')->first();
-        if ($lotteriesEloq === null || $lotteriesEloq->status !== 1) {
-            return $contll->msgOut(false, [], '100400');
-        }
         if (Cache::has('popular_lotteries')) {
             $datas = Cache::get('popular_lotteries');
         } else {
-            $dataEloq = FrontendLotteryRedirectBetList::select('id', 'lotteries_id', 'pic_path')->with(['lotteries' => function ($query) {
-                $query->select('id', 'day_issue', 'en_name');
-            }])->orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->get();
-            $datas = [];
-            foreach ($dataEloq as $key => $dataIthem) {
-                $datas[$key]['en_name'] = $dataIthem->lotteries->en_name;
-                $datas[$key]['pic_path'] = $dataIthem->pic_path;
-                $datas[$key]['day_issue'] = $dataIthem->lotteries->day_issue;
-            }
-            Cache::forever('popular_lotteries', $datas);
+            $datas = FrontendLotteryRedirectBetList::webPopularLotteriesCache();
         }
         return $contll->msgOut(true, $datas);
     }
