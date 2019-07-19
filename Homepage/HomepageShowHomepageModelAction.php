@@ -35,12 +35,7 @@ class HomepageShowHomepageModelAction
         if (Cache::has('showModel')) {
             $data = Cache::get('showModel');
         } else {
-            $homepageModel = $this->model::select('en_name', 'status')->where('is_homepage_display', 1)->get();
-            $data = [];
-            foreach ($homepageModel as $value) {
-                $data[$value->en_name] = $value->status;
-            }
-            Cache::forever('showModel', $data);
+            $data = $this->model::showModelCache();
         }
         return $contll->msgOut(true, $data);
     }
