@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class HomepageRankingAction
@@ -35,7 +36,8 @@ class HomepageRankingAction
             $rankingData = Cache::get('homepage_ranking');
         } else {
             $rankingData = $this->model::select('username', 'lottery_sign', 'bonus')->where('bonus', '>', '0')->orderBy('bonus', 'DESC')->limit($rankingEloq->show_num)->get()->toArray();
-            Cache::forever('homepage_ranking', $rankingData);
+            $expiresAt = Carbon::now()->addHours(1); //缓存1小时
+            Cache::put('homepage_ranking', $rankingData, $expiresAt);
         }
         return $contll->msgOut(true, $rankingData);
     }
