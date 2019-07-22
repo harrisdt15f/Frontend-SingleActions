@@ -40,7 +40,7 @@ class HompageActivityAction
         if (Cache::has('homepage_activity')) {
             $data = Cache::get('homepage_activity');
         } else {
-            $data = FrontendActivityContent::select('id', 'title', 'content', 'thumbnail_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
+            $data = FrontendActivityContent::select('id', 'title', 'content', 'preview_pic_path', 'redirect_url')->where('status', 1)->orderBy('sort', 'asc')->limit($activityEloq->show_num)->get()->toArray();
             Cache::forever('homepage_activity', $data);
         }
         return $contll->msgOut(true, $data);
