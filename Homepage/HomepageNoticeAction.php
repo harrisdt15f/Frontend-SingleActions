@@ -14,7 +14,7 @@ use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-class HompageNoticeAction
+class HomepageNoticeAction
 {
     protected $model;
 
@@ -27,30 +27,23 @@ class HompageNoticeAction
     }
 
     /**
-     * 首页公告列表
+     * 首页 公告|站内信 列表
      * @param FrontendApiMainController $contll
-     * @param $input
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $input): JsonResponse
+    public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
-        if ($noticeEloq === null || $noticeEloq->status !== 1) {
+        if ($noticeEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('homepage_notice')) {
-            $data = Cache::get('homepage_notice');
-        } else {
-            $eloqM = new FrontendMessageNotice();
-            $searchAbleFields = [
-                'type',
-                'status',
-            ];
-            $contll->inputs['status'] = 1;
-            $contll->inputs['type'] = $input;
-            $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin = 0, $withTable = null, $withSearchAbleFields = null, $orderFields = 'sort', $orderFlow = 'asc');
-            Cache::forever('homepage_notice', $data);
-        }
+        $eloqM = new FrontendMessageNotice();
+        $contll->inputs['receive_user_id'] = $contll->partnerUser->id;
+        $searchAbleFields = ['status', 'receive_user_id'];
+        $fixedJoin = 1;
+        $withTable = 'messageContent';
+        $withSearchAbleFields = ['type'];
+        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields = 'id', $orderFlow = 'desc');
         return $contll->msgOut(true, $data);
     }
 }
