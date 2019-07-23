@@ -38,7 +38,7 @@ class HomepageNoticeAction
             return $contll->msgOut(false, [], '100400');
         }
         $eloqM = new FrontendMessageNotice();
-        $contll->inputs['receive_user_id'] = $contll->partnerUser->id;
+        $contll->inputs['receive_user_id'] = $contll->partnerUser->id ?? null;
         $searchAbleFields = ['status', 'receive_user_id'];
         $fixedJoin = 1;
         $withTable = 'messageContent';
