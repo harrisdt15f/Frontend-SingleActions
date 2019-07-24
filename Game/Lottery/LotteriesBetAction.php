@@ -102,10 +102,11 @@ class LotteriesBetAction
             ];
             if ((int)$inputDatas['is_trace'] === 1) {
                 $i = 0;
+                $_totalCost = 0;
                 foreach ($inputDatas['trace_issues'] as $traceMultiple) {
-                    if ($i++ < 1) {
+                    /*if ($i++ < 1) {
                         continue;
-                    }
+                    }*/
                     $_totalCost += $traceMultiple * $singleCost;
                 }
             }
@@ -133,20 +134,12 @@ class LotteriesBetAction
         } else {
             return $contll->msgOut(false, [], '100313');
         }
-        if ((int)$inputDatas['is_trace'] === 1 && count($inputDatas['trace_issues']) > 1) {
-            // 投注追号期号
-            $arrTraceKeys = array_keys($inputDatas['trace_issues']);
-            $traceDataCollection = $lottery->checkTraceData($arrTraceKeys);
-            if (count($arrTraceKeys) !== $traceDataCollection->count()) {
-                return $contll->msgOut(false, [], '100309');
-            }
-            $traceData = array_slice($inputDatas['trace_issues'], 1, null, true);
-        } else {
-            $traceData = [];
-        }
         DB::beginTransaction();
         try {
-            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $traceData, $inputDatas);
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $inputDatas);
+            if (isset($data['error'])) {
+                return $contll->msgOut(false, [], $data['error']);
+            }
             foreach ($data['project'] as $item) {
                 $params = [
                     'user_id' => $usr->id,
