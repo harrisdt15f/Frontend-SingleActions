@@ -29,7 +29,6 @@ class LotteriesBetAction
         $betDetail = [];
         $_totalCost = 0;
         // 初次解析
-        $_balls = [];
         foreach ($inputDatas['balls'] as $item) {
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);
@@ -112,7 +111,6 @@ class LotteriesBetAction
             }
             //######################################
         }
-        $inputDatas['balls'] = $_balls;
         $fTotalCost = (float)$_totalCost;
         $fInputTotalCost = (float)$inputDatas['total_cost'];
         if (pack('f', $fTotalCost) !== pack('f', $fInputTotalCost)) {//因为前端有多种传送 所以不能用三等
