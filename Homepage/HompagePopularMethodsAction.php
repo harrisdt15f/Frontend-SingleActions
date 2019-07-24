@@ -37,21 +37,21 @@ class HompagePopularMethodsAction
         if ($lotteriesEloq === null || $lotteriesEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has('popular_methods')) {
-            $datas = Cache::get('popular_methods');
-        } else {
-            $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with('method')->get();
-            $datas = [];
-            foreach ($methodsEloq as $method) {
-                $data = [
-                    'lotteries_id' => $method->lotteries_id,
-                    'method_id' => $method->method_id,
-                    'lottery_name' => $method->method->lottery_name,
-                    'method_name' => $method->method->method_name,
-                ];
-                $datas[] = $data;
-            }
-            Cache::forever('popular_methods', $datas);
+        $methodsEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with([
+            'method',
+            'currentIssue:lottery_id,issue,end_time',
+        ])->get();
+        $datas = [];
+        foreach ($methodsEloq as $method) {
+            $data = [
+                'lotteries_id' => $method->lotteries_id,
+                'method_id' => $method->method_id,
+                'lottery_name' => $method->method->lottery_name,
+                'method_name' => $method->method->method_name,
+                'issue' => $method->currentIssue->issue ?? null,
+                'end_time' => $method->currentIssue->end_time ?? null,
+            ];
+            $datas[] = $data;
         }
         return $contll->msgOut(true, $datas);
     }
