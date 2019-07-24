@@ -23,7 +23,8 @@ class LotteriesTracesHistoryAction
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
         $eloqM = new LotteryTrace();
-        $searchAbleFields = ['lottery_sign'];
+        $contll->inputs['user_id'] = $contll->partnerUser->id;
+        $searchAbleFields = ['lottery_sign', 'user_id'];
         $fixedJoin = 1;
         $withTable = 'traceLists';
         $withSearchAbleFields = [];
