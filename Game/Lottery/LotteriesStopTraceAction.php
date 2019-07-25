@@ -28,10 +28,23 @@ class LotteriesStopTraceAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        $traceListsEloqs = $this->model->getUnfinishedTrace($inputDatas['id'], $contll->partnerUser->id);
+        if ($inputDatas['type'] == 1) {
+            $traceListsEloqs = $this->model->getUnfinishedTrace($inputDatas['lottery_traces_id'], $contll->partnerUser->id);
+        } elseif ($inputDatas['type'] == 2) {
+            $traceListsEloqs = $this->model::where([
+                ['id', $inputDatas['lottery_trace_lists_id']],
+                ['user_id', $contll->partnerUser->id],
+                ['status', 0],
+            ])->get();
+        } else {
+            return $contll->msgOut(false, [], '100314');
+        }
+        if ($traceListsEloqs->isEmpty()) {
+            return $contll->msgOut(false, [], '100315');
+        }
         DB::beginTransaction();
-        $canceledNum = 0; //取消的期数
-        $canceledAmount = 0; //取消的金额
+        $canceledNum = 0; //本次取消的期数
+        $canceledAmount = 0; //本次取消的金额
         foreach ($traceListsEloqs as $item) {
             $item->status = $item::STATUS_USER_STOPED;
             $item->cancel_time = Carbon::now()->toDateTimeString();
@@ -40,12 +53,12 @@ class LotteriesStopTraceAction
                 DB::rollback();
                 return $contll->msgOut(false, [], '400', $item->errors()->messages());
             }
-            $canceledNum++;
-            $canceledAmount += $item->total_price;
+            $canceledNum++; //本次取消的期数
+            $canceledAmount += $item->total_price; //本次取消的金额
         }
-        $lotteryTraceEloq = LotteryTrace::find($inputDatas['id']);
-        $lotteryTraceEloq->canceled_issues += $canceledNum;
-        $lotteryTraceEloq->canceled_amount += $canceledAmount;
+        $lotteryTraceEloq = LotteryTrace::find($traceListsEloqs->first()->trace_id);
+        $lotteryTraceEloq->canceled_issues += $canceledNum; //lottery_traces表 累积取消的期数
+        $lotteryTraceEloq->canceled_amount += $canceledAmount; //lottery_traces表 累积取消的金额
         $lotteryTraceEloq->save();
         if ($lotteryTraceEloq->errors()->messages()) {
             DB::rollback();
