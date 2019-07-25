@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 class LotteriesStopTraceAction
 {
     protected $model;
+    protected $stopAllTraceType = 1;
+    protected $stopOneTraceType = 2;
 
     /**
      * @param  LotteryTraceList  $lotteryTraceList
@@ -28,13 +30,13 @@ class LotteriesStopTraceAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        if ($inputDatas['type'] == 1) {
+        if ($inputDatas['type'] == $this->stopAllTraceType) {
             $traceListsEloqs = $this->model->getUnfinishedTrace($inputDatas['lottery_traces_id'], $contll->partnerUser->id);
-        } elseif ($inputDatas['type'] == 2) {
+        } elseif ($inputDatas['type'] == $this->stopOneTraceType) {
             $traceListsEloqs = $this->model::where([
                 ['id', $inputDatas['lottery_trace_lists_id']],
                 ['user_id', $contll->partnerUser->id],
-                ['status', 0],
+                ['status', LotteryTraceList::STATUS_WAITING],
             ])->get();
         } else {
             return $contll->msgOut(false, [], '100314');
@@ -45,16 +47,16 @@ class LotteriesStopTraceAction
         DB::beginTransaction();
         $canceledNum = 0; //本次取消的期数
         $canceledAmount = 0; //本次取消的金额
-        foreach ($traceListsEloqs as $item) {
-            $item->status = $item::STATUS_USER_STOPED;
-            $item->cancel_time = Carbon::now()->toDateTimeString();
-            $item->save();
-            if ($item->errors()->messages()) {
+        foreach ($traceListsEloqs as $traceListsItem) {
+            $traceListsItem->status = $traceListsItem::STATUS_USER_STOPED;
+            $traceListsItem->cancel_time = Carbon::now()->toDateTimeString();
+            $traceListsItem->save();
+            if ($traceListsItem->errors()->messages()) {
                 DB::rollback();
-                return $contll->msgOut(false, [], '400', $item->errors()->messages());
+                return $contll->msgOut(false, [], '400', $traceListsItem->errors()->messages());
             }
             $canceledNum++; //本次取消的期数
-            $canceledAmount += $item->total_price; //本次取消的金额
+            $canceledAmount += $traceListsItem->total_price; //本次取消的金额
         }
         $lotteryTraceEloq = LotteryTrace::find($traceListsEloqs->first()->trace_id);
         $lotteryTraceEloq->canceled_issues += $canceledNum; //lottery_traces表 累积取消的期数
