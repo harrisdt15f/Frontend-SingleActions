@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\User\UserProfits;
 use Illuminate\Support\Facades\DB;
 
-class UserAgentCenterAction
+class UserProfitsAction
 {
     protected $model ;
     private $selectSum = [
@@ -40,19 +40,14 @@ class UserAgentCenterAction
         $data = [];
         $sum  = (object)[];
 
-        $request->validate([
-            'username' => 'filled|string|alpha_dash',
-            'start_data'=>'filled|date',
-            'end_data'=>'filled|date',
-        ]);
-
         $username = $request->input('username') ?? '';
         $dateTo = $request->input('date_to') ?? date('Y-m-d');
         $dateFrom = $request->input('date_from') ?? date('Y-m-01');
+        $count = $request->input('count') ?? 15;
 
         $userInfo = $contll->currentAuth->user() ;
 
-        if ($userInfo->parent_id == 0) {
+        if ($userInfo->type == 3) {
             $where = [['parent_id', $userInfo->id],['date', '>=', $dateFrom], ['date', '<=', $dateTo]];
         } else {
             $where = [['user_id', $userInfo->id],['date', '>=', $dateFrom], ['date', '<=', $dateTo],];
@@ -92,7 +87,7 @@ class UserAgentCenterAction
             ->first();
 
         //下级
-        $data['child'] = $this->model->where($where)->select(DB::raw(implode(',', $selectRaw)))->groupBy('user_id')->paginate(15);
+        $data['child'] = $this->model->where($where)->select(DB::raw(implode(',', $selectRaw)))->groupBy('user_id')->paginate($count);
 
         return $contll->msgOut(true, $data);
     }
