@@ -23,6 +23,13 @@ class LotteriesBetAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
+        if ($contll->userAgent->isDesktop()) {
+            $from = Project::FROM_DESKTOP;
+        } elseif ($contll->userAgent->isMobile()) {
+            $from = Project::FROM_MOBILE;
+        } else {
+            $from = Project::FROM_OTHER;
+        }
         $usr = $contll->currentAuth->user();
         $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::getLottery($lotterySign);
@@ -136,7 +143,7 @@ class LotteriesBetAction
         }
         DB::beginTransaction();
         try {
-            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $inputDatas);
+            $data = Project::addProject($usr, $lottery, $currentIssue, $betDetail, $inputDatas, $from);
             if (isset($data['error'])) {
                 return $contll->msgOut(false, [], $data['error']);
             }
