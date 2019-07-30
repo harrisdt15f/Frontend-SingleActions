@@ -23,7 +23,7 @@ class HompageLotteryNoticeListAction
         if ($lotteryNoticeEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        $lotterysEloq = FrontendLotteryNoticeList::select('lotteries_id', 'status', 'sort', 'cn_name')->with('specificNewestOpenedIssue', 'lottery:en_name,icon_path')->where('status', 1)->orderBy('sort', 'asc')->limit($lotteryNoticeEloq->show_num)->get();
+        $lotterysEloq = FrontendLotteryNoticeList::select('lotteries_id', 'status', 'sort', 'cn_name')->with('specificNewestOpenedIssue', 'lottery:en_name,icon_path,series_id')->where('status', 1)->orderBy('sort', 'asc')->limit($lotteryNoticeEloq->show_num)->get();
         $data = [];
         foreach ($lotterysEloq as $lotteryEloq) {
             $issue = $lotteryEloq->specificNewestOpenedIssue->issue ?? null;
@@ -32,6 +32,7 @@ class HompageLotteryNoticeListAction
             $data[] = [
                 'cn_name' => $lotteryEloq->cn_name,
                 'lotteries_id' => $lotteryEloq->lotteries_id,
+                'series_id' => $lotteryEloq->lottery->series_id,
                 'icon' => $lotteryEloq->lottery->icon_path,
                 'issue' => $issue,
                 'official_code' => $officialCode,
