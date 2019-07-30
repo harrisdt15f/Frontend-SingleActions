@@ -44,21 +44,13 @@ class HompagePopularMethodsAction
         ])->get();
         $datas = [];
         foreach ($methodsEloq as $method) {
-            $issue = null;
-            $remainingSeconds = null;
-            if ($method->currentIssue) {
-                $issue = $method->currentIssue->issue;
-                $current = Carbon::now();
-                $endTime = carbon::parse(date('Y-m-d H:i:s', $method->currentIssue->end_time));
-                $remainingSeconds = $current->diffinseconds($endTime, true);
-            }
             $data = [
                 'lotteries_id' => $method->lotteries_id,
                 'method_id' => $method->method_id,
                 'lottery_name' => $method->method->lottery_name,
                 'method_name' => $method->method->method_name,
-                'issue' => $issue,
-                'remaining_seconds' => $remainingSeconds,
+                'issue' => $method->currentIssue->issue ?? null,
+                'end_time' => $method->currentIssue->end_time ?? null,
             ];
             $datas[] = $data;
         }
