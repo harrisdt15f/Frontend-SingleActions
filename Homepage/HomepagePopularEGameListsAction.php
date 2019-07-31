@@ -3,20 +3,20 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Game\ComputerGame\FrontendPopularComputerGameList;
+use App\Models\Game\EGame\FrontendPopularEGameList;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-class HomepagePopularComputerGameListsAction
+class HomepagePopularEGameListsAction
 {
     protected $model;
 
     /**
-     * @param  FrontendPopularComputerGameList  $frontendPopularComputerGameList
+     * @param  FrontendPopularEGameList  $frontendPopularEGameList
      */
-    public function __construct(FrontendPopularComputerGameList $frontendPopularComputerGameList)
+    public function __construct(FrontendPopularEGameList $frontendPopularEGameList)
     {
-        $this->model = $frontendPopularComputerGameList;
+        $this->model = $frontendPopularEGameList;
     }
 
     /**
