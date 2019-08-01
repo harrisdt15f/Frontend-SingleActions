@@ -18,7 +18,7 @@ class LotteriesProjectHistoryAction
     {
         $eloqM = new Project();
         $contll->inputs['user_id'] = $contll->partnerUser->id;
-        $searchAbleFields = ['lottery_sign', 'user_id'];
+        $searchAbleFields = ['user_id', 'lottery_sign', 'serial_number', 'issue', 'status'];
         $orderFields = 'id';
         $orderFlow = 'desc';
         $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
