@@ -57,6 +57,26 @@ class LotteriesStopTraceAction
             }
             $canceledNum++; //本次取消的期数
             $canceledAmount += $traceListsItem->total_price; //本次取消的金额
+            //帐变处理
+            $user = $contll->partnerUser;
+            if ($user->account()->exists()) {
+                $account = $user->account;
+            } else {
+                return $contll->msgOut(false, [], '100313');
+            }
+            $params = [
+                'user_id' => $user->id,
+                'amount' => $traceListsItem['total_price'],
+                'lottery_id' => $traceListsItem['lottery_sign'],
+                'method_id' => $traceListsItem['method_sign'],
+                'project_id' => $traceListsItem['project_id'],
+                'issue' => $traceListsItem['issue'],
+            ];
+            $res = $account->operateAccount($params, 'cancel_order');
+            if ($res !== true) {
+                DB::rollBack();
+                return $contll->msgOut(false, [], '', $res);
+            }
         }
         $lotteryTraceEloq = LotteryTrace::find($traceListsEloqs->first()->trace_id);
         $lotteryTraceEloq->canceled_issues += $canceledNum; //lottery_traces表 累积取消的期数
