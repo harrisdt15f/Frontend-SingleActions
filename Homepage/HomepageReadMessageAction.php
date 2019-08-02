@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 class HomepageReadMessageAction
 {
     /**
-     * 公告|站内信 已读处理
+     * 站内信 已读处理
      * @param  FrontendApiMainController  $contll
      * @param  $inputDatas
      * @return JsonResponse
@@ -20,7 +20,7 @@ class HomepageReadMessageAction
         if ($messageELoq->receive_user_id !== $contll->partnerUser->id) {
             return $contll->msgOut(false, [], '100401');
         }
-        $messageELoq->status = FrontendMessageNotice::READ;
+        $messageELoq->status = FrontendMessageNotice::STATUS_READ;
         $messageELoq->save();
         if ($messageELoq->errors()->messages()) {
             return $contll->msgOut(false, [], '400', $messageELoq->errors()->messages());
