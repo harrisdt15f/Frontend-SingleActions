@@ -9,7 +9,6 @@ use Doctrine\DBAL\Schema\AbstractAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-//48cc94a
 class LotteriesStopTraceAction
 {
     protected $model;
