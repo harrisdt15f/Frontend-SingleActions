@@ -5,10 +5,11 @@ namespace App\Http\SingleActions\Frontend\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
+use Doctrine\DBAL\Schema\AbstractAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-
+//48cc94a
 class LotteriesStopTraceAction
 {
     protected $model;
@@ -16,15 +17,16 @@ class LotteriesStopTraceAction
     protected $stopOneTraceType = 2;
 
     /**
-     * @param  LotteryTraceList  $lotteryTraceList
+     * @param  LotteryTraceList $lotteryTraceList
      */
     public function __construct(LotteryTraceList $lotteryTraceList)
     {
         $this->model = $lotteryTraceList;
     }
+
     /**
      * 终止追号
-     * @param  FrontendApiMainController  $contll
+     * @param  FrontendApiMainController $contll
      * @param  $inputDatas
      * @return JsonResponse
      */
@@ -81,12 +83,34 @@ class LotteriesStopTraceAction
         $lotteryTraceEloq = LotteryTrace::find($traceListsEloqs->first()->trace_id);
         $lotteryTraceEloq->canceled_issues += $canceledNum; //lottery_traces表 累积取消的期数
         $lotteryTraceEloq->canceled_amount += $canceledAmount; //lottery_traces表 累积取消的金额
+        if ($inputDatas['type'] == $this->stopAllTraceType) {
+            $finishedTraceListsEloqs = $this->model->getFinishedTraceToRun($inputDatas['lottery_traces_id'], $contll->partnerUser->id);
+            //有半状态正在运行的状态情况下，如果有不对lotteryTrace 做任何改变
+            if ($finishedTraceListsEloqs->isEmpty()) {
+                $finishedTraceListsEloqs = $this->model->getFinishedTrace($inputDatas['lottery_traces_id'], $contll->partnerUser->id);
+                //如果用户此前有执行过追号其中一条，状态改为STATUS_FINISHED=1 完成，如果没有全部撤销变成 5 用户撤销
+                $lotteryTraceEloq->status = $finishedTraceListsEloqs->isEmpty() ? LotteryTrace::STATUS_USER_DROPED : LotteryTrace::STATUS_FINISHED;
+            }
+        } else {
+            //有半状态正在运行的状态情况下，如果有不对lotteryTrace 做任何改变
+            $runningFlag = $this->model->getRuningTrace($inputDatas['lottery_trace_lists_id'], $contll->partnerUser->id);
+            if ($runningFlag->isEmpty()) {
+                $unFinishedTraceListsEloqs = $this->model->getUnfinishedTraceAllWating($inputDatas['lottery_trace_lists_id'], $contll->partnerUser->id);
+                //如果是空代表执行结束  否则状态不变
+                $lotteryTraceEloq->status = $unFinishedTraceListsEloqs->isEmpty() ? LotteryTrace::STATUS_FINISHED : $lotteryTraceEloq->status;
+                $lotteryList = $this->model->getUnfinishedTraceAll($inputDatas['lottery_trace_lists_id'], $contll->partnerUser->id);
+                //如果用户总共只有一条追号lottery_trace_list，那么撤销了唯一一条，lottery_trace外部状态应为5 用户撤销
+                $lotteryTraceEloq->status = $lotteryList->count() == 1 ? LotteryTrace::STATUS_USER_DROPED : $lotteryTraceEloq->status;
+            }
+        }
         $lotteryTraceEloq->save();
+
         if ($lotteryTraceEloq->errors()->messages()) {
             DB::rollback();
             return $contll->msgOut(false, [], '400', $lotteryTraceEloq->errors()->messages());
         }
         DB::commit();
+
         return $contll->msgOut(true);
     }
 }
