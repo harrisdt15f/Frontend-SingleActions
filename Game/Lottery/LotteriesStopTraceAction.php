@@ -16,7 +16,7 @@ class LotteriesStopTraceAction
     protected $stopOneTraceType = 2;
 
     /**
-     * @param  LotteryTraceList  $lotteryThaharaceList
+     * @param  LotteryTraceList  $lotteryTraceList
      */
     public function __construct(LotteryTraceList $lotteryTraceList)
     {
