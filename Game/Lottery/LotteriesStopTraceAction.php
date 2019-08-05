@@ -5,7 +5,6 @@ namespace App\Http\SingleActions\Frontend\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
-use Doctrine\DBAL\Schema\AbstractAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
