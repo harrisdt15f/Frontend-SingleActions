@@ -19,17 +19,17 @@ class LotteriesLotteryListAction
     {
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])
             ->where('status', 1)->get([
-                'cn_name as name',
-                'en_name',
-                'series_id',
-                'min_times',
-                'max_times',
-                'valid_modes',
-                'min_prize_group',
-                'max_prize_group',
-                'max_trace_number',
-                'day_issue',
-            ]);
+            'cn_name as name',
+            'en_name',
+            'series_id',
+            'min_times',
+            'max_times',
+            'valid_modes',
+            'min_prize_group',
+            'max_prize_group',
+            'max_trace_number',
+            'day_issue',
+        ]);
         $seriesConfig = config('game.main.series');
         $data = [];
         foreach ($lotteries as $lottery) {
@@ -50,8 +50,8 @@ class LotteriesLotteryListAction
                 'max_prize_group' => $lottery->max_prize_group,
                 'max_trace_number' => $lottery->max_trace_number,
                 'day_issue' => $lottery->day_issue,
-                'begin_time' => $lottery->issueRule['begin_time'],
-                'end_time' => $lottery->issueRule['end_time'],
+                'begin_time' => $lottery->issueRule->first()['begin_time'],
+                'end_time' => $lottery->issueRule->first()['end_time'],
             ];
         }
         return $contll->msgOut(true, $data);
