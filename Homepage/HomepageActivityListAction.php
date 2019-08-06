@@ -21,16 +21,16 @@ class HomepageActivityListAction
     }
 
     /**
-     * 首页 公告|站内信 列表
+     * 活动列表
      * @param FrontendApiMainController $contll
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll,$inputDatas): JsonResponse
     {
-        $searchAbleFields = ['title', 'type', 'status', 'admin_name', 'is_time_interval'];
+        $contll->inputs['type']=$inputDatas['type'];
+        $searchAbleFields = ['title','type', 'id','status', 'admin_name', 'is_time_interval'];
         $orderFields = 'sort';
         $orderFlow = 'asc';
-        $contll->type=$inputDatas['type'];
         $datas = $contll->generateSearchQuery($this->model, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
         return $contll->msgOut(true, $datas);
     }
