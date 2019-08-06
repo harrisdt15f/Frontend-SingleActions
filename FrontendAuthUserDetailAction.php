@@ -38,6 +38,7 @@ class FrontendAuthUserDetailAction
             'max_profit_bonus' => SystemConfiguration::getConfigValue('max_profit_bonus'),
             'download_url' => SystemConfiguration::getConfigValue('app_download_url') . '/' . $user->invite_code,
             'version' => SystemConfiguration::getConfigValue('app_version'),
+            'pic_path'=>$user->pic_path
         ];
         return $contll->msgOut(true, $data);
     }
