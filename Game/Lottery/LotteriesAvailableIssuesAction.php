@@ -39,7 +39,7 @@ class LotteriesAvailableIssuesAction
             ];
         }
         // 上一期
-        $_lastIssue = LotteryIssue::getLastIssue($lotterySign);
+        $_lastIssue = LotteryIssue::getPastIssue($lotterySign);
         $lastIssue = $_lastIssue !== null ? [
             'issue_no' => $_lastIssue->issue,
             'begin_time' => $_lastIssue->begin_time,
