@@ -46,6 +46,10 @@ class FrontendAuthLoginAction
         if (!$token = $contll->currentAuth->attempt($credentials)) {
             return $contll->msgOut(false, [], '100002');
         }
+        if($contll->currentAuth->user()->frozen_type==1){
+            return $contll->msgOut(false, [], '100014');
+        }
+
         $request->session()->regenerate();
         $this->clearLoginAttempts($request);
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -74,7 +78,6 @@ class FrontendAuthLoginAction
         ];
         return $contll->msgOut(true, $data);
     }
-
     protected function throttleKey(Request $request): ?string
     {
         if ($this->userAgent->isDesktop()) {
