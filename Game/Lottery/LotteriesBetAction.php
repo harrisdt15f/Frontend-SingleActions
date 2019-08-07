@@ -17,6 +17,7 @@ class LotteriesBetAction
     public const NO_BETING = 2;
     public const NO_USE_MONEY = 4;
 
+
     /**
      * 游戏-投注
      * @param  FrontendApiMainController $contll
@@ -35,11 +36,11 @@ class LotteriesBetAction
         }
         $usr = $contll->currentAuth->user();
         //不准投注的账户
-        if ($usr->frozen_type == self::NOBETING) {
+        if ($usr->frozen_type == self::NO_BETING) {
             return $contll->msgOut(false, [], '100317');
         }
         //不可资金操作的账户
-        if ($usr->frozen_type == self::NOUSEMONY) {
+        if ($usr->frozen_type == self::NO_USE_MONEY) {
             return $contll->msgOut(false, [], '100318');
         }
         $lotterySign = $inputDatas['lottery_sign'];
