@@ -5,11 +5,9 @@ namespace App\Http\SingleActions\Frontend\Game\Lottery;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Game\Lottery\LotteryTraceList;
 use App\Models\LotteryTrace;
-use Doctrine\DBAL\Schema\AbstractAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-//48cc94a
 class LotteriesStopTraceAction
 {
     protected $model;
@@ -17,7 +15,7 @@ class LotteriesStopTraceAction
     protected $stopOneTraceType = 2;
 
     /**
-     * @param  LotteryTraceList $lotteryTraceList
+     * @param  LotteryTraceList  $lotteryTraceList
      */
     public function __construct(LotteryTraceList $lotteryTraceList)
     {
