@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Validator;
 
 class LotteriesBetAction
 {
+    public const NOBETING = 2;
+    public const NOUSEMONY = 4;
+
     /**
      * 游戏-投注
-     * @param  FrontendApiMainController  $contll
+     * @param  FrontendApiMainController $contll
      * @param  $inputDatas
      * @return JsonResponse
      * @throws Exception
@@ -31,6 +34,14 @@ class LotteriesBetAction
             $from = Project::FROM_OTHER;
         }
         $usr = $contll->currentAuth->user();
+        //不准投注的账户
+        if ($usr->frozen_type == self::NOBETING) {
+            return $contll->msgOut(false, [], '100317');
+        }
+        //不可资金操作的账户
+        if ($usr->frozen_type == self::NOUSEMONY) {
+            return $contll->msgOut(false, [], '100318');
+        }
         $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::getLottery($lotterySign);
         $betDetail = [];
@@ -56,7 +67,7 @@ class LotteriesBetAction
             $times = (int)$item['times'];
             // 转换格式
             $project['codes'] = $oMethod->resolve($oMethod->parse64($item['codes']));
-            $string = 'method_id'.$methodId.'before'.$item['codes'].'after'.$project['codes'];
+            $string = 'method_id' . $methodId . 'before' . $item['codes'] . 'after' . $project['codes'];
             Log::info($string);
             if ($oMethod->supportExpand) {
                 $position = [];
@@ -165,8 +176,8 @@ class LotteriesBetAction
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
-            Log::info('投注-异常:'.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine()); //Clog::userBet
-            return $contll->msgOut(false, [], '', '对不起, '.$e->getMessage().'|'.$e->getFile().'|'.$e->getLine());
+            Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
+            return $contll->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
         }
         return $contll->msgOut(true, $data);
     }
