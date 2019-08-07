@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Validator;
 
 class LotteriesBetAction
 {
-    public const NOBETING = 2;
-    public const NOUSEMONY = 4;
+    public const NO_BETING = 2;
+    public const NO_USE_MONEY = 4;
 
     /**
      * 游戏-投注
