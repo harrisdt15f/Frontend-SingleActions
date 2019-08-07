@@ -19,6 +19,7 @@ class LotteriesLotteryListAction
     {
         $lotteries = LotteryList::with(['issueRule:lottery_id,begin_time,end_time'])
             ->where('status', 1)->get([
+            'id',
             'cn_name as name',
             'en_name',
             'series_id',
@@ -41,6 +42,7 @@ class LotteriesLotteryListAction
                 ];
             }
             $data[$lottery->series_id]['list'][] = [
+                'number_id' => $lottery->id,
                 'id' => $lottery->en_name,
                 'name' => $lottery->name,
                 'min_times' => $lottery->min_times,
