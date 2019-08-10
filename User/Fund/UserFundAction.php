@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @Author: Fish
- * @Date:   2019-07-2 12:42:55
- */
-
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -32,11 +27,11 @@ class UserFundAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $contll->inputs['user_id'] = $contll->partnerUser->id;
+        $searchAbleFields = ['type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
         $fixedJoin = 1; //number of joining tables
         $withTable = 'gameMethods';
-        $searchAbleFields = ['issue', 'process_time', 'type_name', 'amount', 'balance', 'method_id', 'user_id'];
-        $withSearchAbleFields = ['method_id', 'lottery_name', 'method_name'];
-        $orderFields = 'id';
+        $withSearchAbleFields = [];
+        $orderFields = 'created_at';
         $orderFlow = 'desc';
         $data = $contll->generateSearchQuery($this->model, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
