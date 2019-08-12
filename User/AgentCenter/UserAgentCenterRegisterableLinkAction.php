@@ -26,11 +26,11 @@ class UserAgentCenterRegisterableLinkAction
      * @param $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $request): JsonResponse
+    public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $data = [];
 
-        $count = $request->input('count') ?? 15;
+        $count = $contll->inputs('page_size') ?? 20;
         
         //链接有效期列表
         $data['expire_list'] = SystemConfiguration::getConfigValue('users_register_expire');
