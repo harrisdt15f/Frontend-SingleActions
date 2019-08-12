@@ -21,8 +21,7 @@ class LotteriesLotteryInfoAction
         if (Cache::has($redisKey)) {
             $data = Cache::get($redisKey);
         } else {
-            $lotteryModel = new LotteryList();
-            $data = $lotteryModel->lotteryInfoCache();
+            $data = LotteryList::lotteryInfoCache();
         }
         return $contll->msgOut(true, $data);
     }
