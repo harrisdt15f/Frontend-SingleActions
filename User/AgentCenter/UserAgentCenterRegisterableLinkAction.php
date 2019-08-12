@@ -30,7 +30,7 @@ class UserAgentCenterRegisterableLinkAction
     {
         $data = [];
 
-        $count = $contll->inputs('page_size') ?? 20;
+        $count = $contll->inputs['page_size'] ?? 20;
         
         //链接有效期列表
         $data['expire_list'] = SystemConfiguration::getConfigValue('users_register_expire');
