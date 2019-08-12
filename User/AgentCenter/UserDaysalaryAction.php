@@ -70,12 +70,12 @@ class UserDaysalaryAction
             ['user_id', $userInfo->id]
         ])->select(DB::raw(implode(',', $selectRaw)))
             ->first();
-        $data['self']->remark = $data['self']->turnover .'*'.  $data['self']->daysalary_percentage .'%='.$data['self']->turnover*$data['self']->daysalary_percentage/100;
+        $data['self']->remark = round($data['self']->turnover, 2) .'*'.  $data['self']->daysalary_percentage .'%='.round($data['self']->turnover*$data['self']->daysalary_percentage/100, 2);
         //下级
         $data['child'] = $this->model->where($where)->select(DB::raw(implode(',', $selectRaw)))->groupBy('user_id')->paginate($count)->toArray();
 
-        foreach ($data['child']['data'] as $k => $v){
-            $data['child']['data'][$k]['remark'] = $v['turnover'].'*'.$v['daysalary_percentage'].'%='.$v['turnover']*$v['daysalary_percentage']/100;
+        foreach ($data['child']['data'] as $k => $v) {
+            $data['child']['data'][$k]['remark'] = round($v['turnover'], 2) . '*' . $v['daysalary_percentage'] . '%=' . round($v['turnover'] * $v['daysalary_percentage'] / 100, 2);
         }
 
         return $contll->msgOut(true, $data);
