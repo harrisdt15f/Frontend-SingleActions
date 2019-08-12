@@ -38,7 +38,7 @@ class UserAgentCenterRegisterLinkAction
         $expire_list = json_decode($expire_list,true);
 
         if(!in_array($expire,$expire_list)){
-            return $contll->msgOut(false, [], '100500');
+            return $contll->msgOut(false, [], '100600');
         }
         
         //最低开户奖金组
@@ -52,13 +52,13 @@ class UserAgentCenterRegisterLinkAction
         }
         
         if($prize_group < $min_user_prize_group || $prize_group > $max_user_prize_group){
-            return $contll->msgOut(false, [], '100501');
+            return $contll->msgOut(false, [], '100601');
         }
         
         //开户链接
         $frontUrl = SystemConfiguration::getConfigValue('platform_fronted_host_url');
         $keyword = random_int(11,99).substr(uniqid(),7);
-        $url = trim($frontUrl,'/').'/'.$keyword;
+        $url = trim($frontUrl,'/').'/register/'.$keyword;
         
         $addData = [
             'user_id' => $userInfo->id,
