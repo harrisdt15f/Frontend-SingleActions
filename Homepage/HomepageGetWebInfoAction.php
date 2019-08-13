@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 class HomepageGetWebInfoAction
 {
     /**
-     * 获取网站基本配置
+     * 获取网站基本信息
      * @param  FrontendApiMainController $contll
      * @return JsonResponse
      */
