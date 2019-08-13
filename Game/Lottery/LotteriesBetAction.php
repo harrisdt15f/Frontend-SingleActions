@@ -17,7 +17,6 @@ class LotteriesBetAction
     public const NO_BETING = 2;
     public const NO_USE_MONEY = 4;
 
-
     /**
      * 游戏-投注
      * @param  FrontendApiMainController $contll
