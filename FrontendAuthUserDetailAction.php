@@ -22,6 +22,7 @@ class FrontendAuthUserDetailAction
         $data = [
             'user_id' => $user->id,
             'username' => $user->username,
+            'min_prize_group' => $contll->currentPlatformEloq->prize_group_min,
             'prize_group' => $user->prize_group,
             'user_type' => $user->type,
             'is_tester' => $user->is_tester,
