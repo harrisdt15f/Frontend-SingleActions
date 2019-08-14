@@ -20,11 +20,19 @@ class LotteriesTracesHistoryAction
         $contll->inputs['user_id'] = $contll->partnerUser->id;
         $searchAbleFields = ['user_id', 'lottery_sign', 'status'];
         $fixedJoin = 1;
-        $withTable = ['traceLists','lottery:en_name,icon_path'];
+        $withTable = 'traceLists';
         $withSearchAbleFields = ['project_serial_number', 'issue'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery(
+            $eloqM,
+            $searchAbleFields,
+            $fixedJoin,
+            $withTable,
+            $withSearchAbleFields,
+            $orderFields,
+            $orderFlow
+        );
         return $contll->msgOut(true, $data);
     }
 }
