@@ -177,7 +177,12 @@ class LotteriesBetAction
         } catch (Exception $e) {
             DB::rollBack();
             Log::info('投注-异常:' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()); //Clog::userBet
-            return $contll->msgOut(false, [], '', '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine());
+            return $contll->msgOut(
+                false,
+                [],
+                '',
+                '对不起, ' . $e->getMessage() . '|' . $e->getFile() . '|' . $e->getLine()
+            );
         }
         return $contll->msgOut(true, $data);
     }
