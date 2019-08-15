@@ -59,14 +59,16 @@ class FrontendAuthRegisterAction
 
         //0.普通注册
         if ($registerType == 0) {
-            $hostPlatform = SystemConfiguration::getConfigValue('host_platform_settings');
+            $hostPlatform = configure('host_platform_settings');
             $hostPlatform = json_decode($hostPlatform, true);
 
-            if (isset($hostPlatform[$inputDatas['host']])) {
-                $plat = $hostPlatform[$inputDatas['host']];
-                isset($plat['platform_id']) && $inputDatas['platform_id'] = $plat['platform_id'];
-                isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
+            if (!isset($hostPlatform[$inputDatas['host']])) {
+                return $contll->msgOut(false, [], '100020');
             }
+
+            $plat = $hostPlatform[$inputDatas['host']];
+            isset($plat['platform_id']) && $inputDatas['platform_id'] = $plat['platform_id'];
+            isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
         }
 
 
@@ -87,9 +89,9 @@ class FrontendAuthRegisterAction
             $inputDatas['platform_sign'] = $contll->currentPlatformEloq->platform_sign;
 
             //最低开户奖金组
-            $min_user_prize_group = SystemConfiguration::getConfigValue('min_user_prize_group');
+            $min_user_prize_group = configure('min_user_prize_group');
             //最高开户奖金组
-            $max_user_prize_group = SystemConfiguration::getConfigValue('max_user_prize_group');
+            $max_user_prize_group = configure('max_user_prize_group');
 
             $userInfo = $contll->currentAuth->user();
             if ($userInfo->prize_group < $max_user_prize_group) {

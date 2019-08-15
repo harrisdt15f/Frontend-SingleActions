@@ -34,7 +34,7 @@ class UserAgentCenterRegisterLinkAction
         $prize_group = $inputDatas['prize_group'];
 
         //链接有效期列表
-        $expire_list = SystemConfiguration::getConfigValue('users_register_expire');
+        $expire_list = configure('users_register_expire');
         $expire_list = json_decode($expire_list, true);
 
         if (!in_array($expire, $expire_list)) {
@@ -42,9 +42,9 @@ class UserAgentCenterRegisterLinkAction
         }
 
         //最低开户奖金组
-        $min_user_prize_group = SystemConfiguration::getConfigValue('min_user_prize_group');
+        $min_user_prize_group = configure('min_user_prize_group');
         //最高开户奖金组
-        $max_user_prize_group = SystemConfiguration::getConfigValue('max_user_prize_group');
+        $max_user_prize_group = configure('max_user_prize_group');
 
         $userInfo = $contll->currentAuth->user();
         if ($userInfo->prize_group < $max_user_prize_group) {
@@ -56,7 +56,7 @@ class UserAgentCenterRegisterLinkAction
         }
 
         //开户链接
-        $frontUrl = SystemConfiguration::getConfigValue('web_fronted_url');
+        $frontUrl = configure('web_fronted_url');
         $keyword = random_int(11, 99) . substr(uniqid(), 7);
         $url = trim($frontUrl, '/') . '/register/' . $keyword;
 
