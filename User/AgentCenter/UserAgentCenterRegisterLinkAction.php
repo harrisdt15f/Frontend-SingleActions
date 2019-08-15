@@ -55,7 +55,7 @@ class UserAgentCenterRegisterLinkAction
             return $contll->msgOut(false, [], '100601');
         }
 
-        if ($userInfo->type != 2) {
+        if ($userInfo->type != 2 || $userInfo->type != 1) {
             return $contll->msgOut(false, [], '100602');
         }
         
@@ -80,7 +80,7 @@ class UserAgentCenterRegisterLinkAction
 
         if ($expire > 0) {
             $addData['valid_days'] = $expire;
-            $addData['expired_at'] = strtotime("+ {$expire} days");
+            $addData['expired_at'] = date('Y-m-d H:i:s', strtotime("+ {$expire} days"));
         }
 
         try {
