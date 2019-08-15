@@ -13,7 +13,6 @@ use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\FrontendUsersSpecificInfo;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class FrontendAuthRegisterAction
@@ -85,7 +84,7 @@ class FrontendAuthRegisterAction
                 return $contll->msgOut(false, [], '100019');
             }
 
-            $inputDatas['parent_id'] = Auth::id();
+            $inputDatas['parent_id'] = $userInfo->id;
             $inputDatas['platform_id'] = $contll->currentPlatformEloq->platform_id;
             $inputDatas['platform_sign'] = $contll->currentPlatformEloq->platform_sign;
 
