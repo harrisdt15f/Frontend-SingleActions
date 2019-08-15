@@ -80,7 +80,8 @@ class FrontendAuthRegisterAction
             }
 
             //当前用户需要登录
-            if (!Auth::check()) {
+            $userInfo = $contll->currentAuth->user();
+            if (!$userInfo) {
                 return $contll->msgOut(false, [], '100019');
             }
 
@@ -92,8 +93,7 @@ class FrontendAuthRegisterAction
             $min_user_prize_group = configure('min_user_prize_group');
             //最高开户奖金组
             $max_user_prize_group = configure('max_user_prize_group');
-
-            $userInfo = $contll->currentAuth->user();
+            
             if ($userInfo->prize_group < $max_user_prize_group) {
                 $max_user_prize_group = $userInfo->prize_group;
             }
@@ -125,6 +125,11 @@ class FrontendAuthRegisterAction
             $inputDatas['platform_sign'] = $link->platform_sign;
         }
 
+        if (!isset($inputDatas['platform_id']) || !isset($inputDatas['platform_sign'])) {
+            return $contll->msgOut(false, [], '100020');
+        }
+        
+        
         //验证平台信息是否存在
         $platform = SystemPlatform::where('platform_id', $inputDatas['platform_id'])
             ->where('platform_sign', $inputDatas['platform_sign'])
