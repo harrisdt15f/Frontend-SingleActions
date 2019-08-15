@@ -55,10 +55,23 @@ class UserAgentCenterRegisterLinkAction
             return $contll->msgOut(false, [], '100601');
         }
 
-        if ($userInfo->type != 2) {
+        if ($userInfo->type != 2 && $userInfo->type != 1) {
             return $contll->msgOut(false, [], '100602');
         }
-        
+
+        //当前用户最多10条有效链接
+        $userfulLinksCount = $this->model->where('status', 1)
+            ->where('user_id', $userInfo->id)
+            ->where(
+                function ($query) {
+                    $query->whereNull('expired_at')->orWhere('expired_at', '>=', time());
+                }
+            )->count();
+
+        if ($userfulLinksCount > 10) {
+            return $contll->msgOut(false, [], '100603');
+        }
+
         //开户链接
         $frontUrl = configure('web_fronted_url');
         $keyword = random_int(11, 99) . substr(uniqid(), 7);
@@ -80,7 +93,7 @@ class UserAgentCenterRegisterLinkAction
 
         if ($expire > 0) {
             $addData['valid_days'] = $expire;
-            $addData['expired_at'] = strtotime("+ {$expire} days");
+            $addData['expired_at'] = date('Y-m-d H:i:s', strtotime("+ {$expire} days"));
         }
 
         try {

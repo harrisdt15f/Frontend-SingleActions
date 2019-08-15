@@ -3,7 +3,6 @@
 namespace App\Http\SingleActions\Frontend;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\SystemPlatform;
 use App\Models\User\FrontendUsersRegisterableLink;
 use App\Models\User\FrontendLinksRegisteredUsers;
@@ -13,6 +12,7 @@ use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\FrontendUsersSpecificInfo;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class FrontendAuthRegisterAction
@@ -55,7 +55,7 @@ class FrontendAuthRegisterAction
 
         $inputDatas['vip_level'] = 0;
         $inputDatas['parent_id'] = 0;
-        $inputDatas['type'] = 3;//用户类型你:1 直属2代理3会员
+        $rid = '';
 
         //0.普通注册
         if ($registerType == 0) {
@@ -69,6 +69,7 @@ class FrontendAuthRegisterAction
             $plat = $hostPlatform[$inputDatas['host']];
             isset($plat['platform_id']) && $inputDatas['platform_id'] = $plat['platform_id'];
             isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
+            $inputDatas['type'] = 3;//用户类型你:1 直属2代理3会员
         }
 
 
@@ -88,12 +89,12 @@ class FrontendAuthRegisterAction
             $inputDatas['parent_id'] = $userInfo->id;
             $inputDatas['platform_id'] = $contll->currentPlatformEloq->platform_id;
             $inputDatas['platform_sign'] = $contll->currentPlatformEloq->platform_sign;
-
+            $rid = $userInfo->rid;
             //最低开户奖金组
             $min_user_prize_group = configure('min_user_prize_group');
             //最高开户奖金组
             $max_user_prize_group = configure('max_user_prize_group');
-            
+
             if ($userInfo->prize_group < $max_user_prize_group) {
                 $max_user_prize_group = $userInfo->prize_group;
             }
@@ -123,13 +124,20 @@ class FrontendAuthRegisterAction
             $inputDatas['parent_id'] = $link->user_id;
             $inputDatas['platform_id'] = $link->platform_id;
             $inputDatas['platform_sign'] = $link->platform_sign;
+
+            $parent = FrontendUser::where('id', $link->user_id)->first();
+            if (!$parent) {
+                return $contll->msgOut(false, [], '100021');
+            }
+
+            $rid = $parent->rid;
         }
 
         if (!isset($inputDatas['platform_id']) || !isset($inputDatas['platform_sign'])) {
             return $contll->msgOut(false, [], '100020');
         }
-        
-        
+
+
         //验证平台信息是否存在
         $platform = SystemPlatform::where('platform_id', $inputDatas['platform_id'])
             ->where('platform_sign', $inputDatas['platform_sign'])
@@ -161,7 +169,8 @@ class FrontendAuthRegisterAction
             $FrontendUsersSpecificInfo->save();
             $inputDatas['user_specific_id'] = $FrontendUsersSpecificInfo->id;
             $user = $this->model::create($inputDatas);
-            $user->rid = $user->id;
+            $rid .= '|' . $user->id;
+            $user->rid = $rid;
 
             //账户信息
             $userAccountEloq = new FrontendUsersAccount();
@@ -189,6 +198,21 @@ class FrontendAuthRegisterAction
 
             DB::commit();
             $data['name'] = $user->username;
+            
+            //普通注册，用户登录
+            if ($registerType == 0) {
+                $credentials = request(['username', 'password']);
+                $token = $contll->currentAuth->attempt($credentials);
+                $expireInMinute = $contll->currentAuth->factory()->getTTL();
+                $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
+                
+                $data = [
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_at' => $expireAt,
+                ];
+            }
+            
             return $contll->msgOut(true, $data);
         } catch (Exception $e) {
             DB::rollBack();
