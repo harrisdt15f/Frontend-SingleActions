@@ -36,9 +36,9 @@ class FrontendAuthUserDetailAction
             'balance' => sprintf('%1.4f', substr($balance, 0, strrpos($balance, '.') + 1 + 4)),
             'frozen_balance' => sprintf('%1.4f', substr($frozen, 0, strrpos($frozen, '.') + 1 + 4)),
             'has_funds_password' => $user->fund_password ? true : false,
-            'max_profit_bonus' => SystemConfiguration::getConfigValue('max_profit_bonus'),
-            'download_url' => SystemConfiguration::getConfigValue('app_download_url') . '/' . $user->invite_code,
-            'version' => SystemConfiguration::getConfigValue('app_version'),
+            'max_profit_bonus' => configure('max_profit_bonus'),
+            'download_url' => configure('app_download_url') . '/' . $user->invite_code,
+            'version' => configure('app_version'),
             'pic_path'=>$user->pic_path
         ];
         return $contll->msgOut(true, $data);
