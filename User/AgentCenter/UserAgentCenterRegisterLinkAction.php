@@ -55,7 +55,7 @@ class UserAgentCenterRegisterLinkAction
             return $contll->msgOut(false, [], '100601');
         }
 
-        if ($userInfo->type != 2 || $userInfo->type != 1) {
+        if ($userInfo->type != 2 && $userInfo->type != 1) {
             return $contll->msgOut(false, [], '100602');
         }
 
