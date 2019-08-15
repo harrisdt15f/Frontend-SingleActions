@@ -55,6 +55,10 @@ class UserAgentCenterRegisterLinkAction
             return $contll->msgOut(false, [], '100601');
         }
 
+        if ($userInfo->type != 2) {
+            return $contll->msgOut(false, [], '100602');
+        }
+        
         //开户链接
         $frontUrl = configure('web_fronted_url');
         $keyword = random_int(11, 99) . substr(uniqid(), 7);
@@ -65,7 +69,7 @@ class UserAgentCenterRegisterLinkAction
             'username' => $userInfo->username,
             'prize_group' => $prize_group,
             'type' => 0,//0链接注册1扫码注册
-            'is_agent' => 1,//0  用户 1 代理
+            'is_agent' => 0,//链接注册的用户类型：0用户1代理
             'channel' => $channel,
             'keyword' => $keyword,
             'url' => $url,

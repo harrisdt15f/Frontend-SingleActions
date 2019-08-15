@@ -45,6 +45,7 @@ class UserAgentCenterRegisterableLinkAction
 
         //有效开户链接
         $data['links'] = $this->model->where('status', 1)
+            ->where('user_id', $userInfo->id)
             ->where(
                 function ($query) {
                     $query->whereNull('expired_at')->orWhere('expired_at', '>=', time());

@@ -55,6 +55,7 @@ class FrontendAuthRegisterAction
 
         $inputDatas['vip_level'] = 0;
         $inputDatas['parent_id'] = 0;
+        $inputDatas['type'] = 3;//用户类型你:1 直属2代理3会员
 
         //0.普通注册
         if ($registerType == 0) {
