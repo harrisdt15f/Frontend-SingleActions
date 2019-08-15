@@ -57,6 +57,19 @@ class FrontendAuthRegisterAction
         $inputDatas['vip_level'] = 0;
         $inputDatas['parent_id'] = 0;
 
+        //0.普通注册
+        if ($registerType == 0) {
+            $hostPlatform = SystemConfiguration::getConfigValue('host_platform_settings');
+            $hostPlatform = json_decode($hostPlatform, true);
+
+            if (isset($hostPlatform[$inputDatas['host']])) {
+                $plat = $hostPlatform[$inputDatas['host']];
+                isset($plat['platform_id']) && $inputDatas['platform_id'] = $plat['platform_id'];
+                isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
+            }
+        }
+
+
         //1.人工开户注册
         if ($registerType == 1) {
             $inputDatas['prize_group'] = $inputDatas['prize_group'] ?? 0;
@@ -126,6 +139,8 @@ class FrontendAuthRegisterAction
         //删除不必要的数据
         unset($inputDatas['keyword']);
         unset($inputDatas['platform_sign']);
+        unset($inputDatas['host']);
+        unset($inputDatas['register_type']);
 
         //插入信息
         DB::beginTransaction();
