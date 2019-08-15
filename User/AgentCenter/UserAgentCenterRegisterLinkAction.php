@@ -32,34 +32,34 @@ class UserAgentCenterRegisterLinkAction
         $expire = $inputDatas['expire'];
         $channel = $inputDatas['channel'];
         $prize_group = $inputDatas['prize_group'];
-        
+
         //链接有效期列表
         $expire_list = SystemConfiguration::getConfigValue('users_register_expire');
-        $expire_list = json_decode($expire_list,true);
+        $expire_list = json_decode($expire_list, true);
 
-        if(!in_array($expire,$expire_list)){
+        if (!in_array($expire, $expire_list)) {
             return $contll->msgOut(false, [], '100600');
         }
-        
+
         //最低开户奖金组
         $min_user_prize_group = SystemConfiguration::getConfigValue('min_user_prize_group');
         //最高开户奖金组
         $max_user_prize_group = SystemConfiguration::getConfigValue('max_user_prize_group');
 
-        $userInfo = $contll->currentAuth->user() ;
-        if($userInfo->prize_group < $max_user_prize_group ){
+        $userInfo = $contll->currentAuth->user();
+        if ($userInfo->prize_group < $max_user_prize_group) {
             $max_user_prize_group = $userInfo->prize_group;
         }
-        
-        if($prize_group < $min_user_prize_group || $prize_group > $max_user_prize_group){
+
+        if ($prize_group < $min_user_prize_group || $prize_group > $max_user_prize_group) {
             return $contll->msgOut(false, [], '100601');
         }
-        
+
         //开户链接
-        $frontUrl = SystemConfiguration::getConfigValue('platform_fronted_host_url');
-        $keyword = random_int(11,99).substr(uniqid(),7);
-        $url = trim($frontUrl,'/').'/register/'.$keyword;
-        
+        $frontUrl = SystemConfiguration::getConfigValue('web_fronted_url');
+        $keyword = random_int(11, 99) . substr(uniqid(), 7);
+        $url = trim($frontUrl, '/') . '/register/' . $keyword;
+
         $addData = [
             'user_id' => $userInfo->id,
             'username' => $userInfo->username,
@@ -70,13 +70,15 @@ class UserAgentCenterRegisterLinkAction
             'keyword' => $keyword,
             'url' => $url,
             'status' => 1,
+            'platform_id' => $contll->currentPlatformEloq->platform_id,
+            'platform_sign' => $contll->currentPlatformEloq->platform_sign,
         ];
-        
-        if($expire > 0){
+
+        if ($expire > 0) {
             $addData['valid_days'] = $expire;
             $addData['expired_at'] = strtotime("+ {$expire} days");
         }
-        
+
         try {
             $FrontendUsersRegisterableLink = new $this->model;
             $FrontendUsersRegisterableLink->fill($addData);
@@ -86,7 +88,7 @@ class UserAgentCenterRegisterLinkAction
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
             return $contll->msgOut(false, [], $sqlState, $msg);
         }
-        
+
         return $contll->msgOut(true, $FrontendUsersRegisterableLink);
     }
 }
