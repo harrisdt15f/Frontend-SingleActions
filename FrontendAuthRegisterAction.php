@@ -12,6 +12,7 @@ use App\Models\User\Fund\FrontendUsersAccount;
 use App\Models\User\FrontendUsersSpecificInfo;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class FrontendAuthRegisterAction
@@ -197,6 +198,21 @@ class FrontendAuthRegisterAction
 
             DB::commit();
             $data['name'] = $user->username;
+            
+            //普通注册，用户登录
+            if ($registerType == 0) {
+                $credentials = request(['username', 'password']);
+                $token = $contll->currentAuth->attempt($credentials);
+                $expireInMinute = $contll->currentAuth->factory()->getTTL();
+                $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
+                
+                $data = [
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_at' => $expireAt,
+                ];
+            }
+            
             return $contll->msgOut(true, $data);
         } catch (Exception $e) {
             DB::rollBack();
