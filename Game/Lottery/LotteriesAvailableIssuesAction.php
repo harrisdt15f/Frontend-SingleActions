@@ -20,6 +20,9 @@ class LotteriesAvailableIssuesAction
         $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::findBySign($lotterySign);
         $canUserInfo = LotteryIssue::getCanBetIssue($lotterySign, $lottery->max_trace_number);
+        if ($canUserInfo->count() === 0) {
+            LotteryIssue::generateTodayIssue($lotterySign); //生成彩种的今日奖期
+        }
         $canBetIssueData = [];
         $currentIssue = [];
         foreach ($canUserInfo as $index => $issue) {
