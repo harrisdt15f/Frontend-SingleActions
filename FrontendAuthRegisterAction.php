@@ -55,6 +55,7 @@ class FrontendAuthRegisterAction
 
         $inputDatas['vip_level'] = 0;
         $inputDatas['parent_id'] = 0;
+        $inputDatas['top_id'] = 0;
         $rid = '';
 
         //0.普通注册
@@ -87,6 +88,7 @@ class FrontendAuthRegisterAction
             }
 
             $inputDatas['parent_id'] = $userInfo->id;
+            $inputDatas['top_id'] = $userInfo->top_id;
             $inputDatas['platform_id'] = $contll->currentPlatformEloq->platform_id;
             $inputDatas['platform_sign'] = $contll->currentPlatformEloq->platform_sign;
             $rid = $userInfo->rid;
@@ -131,6 +133,7 @@ class FrontendAuthRegisterAction
             }
 
             $rid = $parent->rid;
+            $inputDatas['top_id'] = $parent->top_id;
         }
 
         if (!isset($inputDatas['platform_id']) || !isset($inputDatas['platform_sign'])) {
@@ -144,6 +147,17 @@ class FrontendAuthRegisterAction
             ->first();
         if (is_null($platform)) {
             return $contll->msgOut(false, [], '100020');
+        }
+
+        if ($registerType > 0) {
+            //每个用户最多拥有子账户数量，默认100个
+            $usersChildNum = configure('users_child_num', 100);
+
+            $childNum = $this->model->where('parent_id', $inputDatas['parent_id'])->count();
+
+            if ($childNum >= $usersChildNum) {
+                return $contll->msgOut(false, [], '100022');
+            }
         }
 
         $inputDatas['password'] = bcrypt($inputDatas['password']);
@@ -169,7 +183,9 @@ class FrontendAuthRegisterAction
             $FrontendUsersSpecificInfo->save();
             $inputDatas['user_specific_id'] = $FrontendUsersSpecificInfo->id;
             $user = $this->model::create($inputDatas);
-            $rid .= '|' . $user->id;
+
+            $rid != '' && $rid .= '|';
+            $rid .= $user->id;
             $user->rid = $rid;
 
             //账户信息
@@ -198,21 +214,21 @@ class FrontendAuthRegisterAction
 
             DB::commit();
             $data['name'] = $user->username;
-            
+
             //普通注册，用户登录
             if ($registerType == 0) {
                 $credentials = request(['username', 'password']);
                 $token = $contll->currentAuth->attempt($credentials);
                 $expireInMinute = $contll->currentAuth->factory()->getTTL();
                 $expireAt = Carbon::now()->addMinutes($expireInMinute)->format('Y-m-d H:i:s');
-                
+
                 $data = [
                     'access_token' => $token,
                     'token_type' => 'Bearer',
                     'expires_at' => $expireAt,
                 ];
             }
-            
+
             return $contll->msgOut(true, $data);
         } catch (Exception $e) {
             DB::rollBack();

@@ -3,7 +3,6 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\User\FrontendUsersRegisterableLink;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -32,6 +31,7 @@ class UserAgentCenterRegisterLinkAction
         $expire = $inputDatas['expire'];
         $channel = $inputDatas['channel'];
         $prize_group = $inputDatas['prize_group'];
+        $is_agent = $inputDatas['is_agent'];
 
         //链接有效期列表
         $expire_list = configure('users_register_expire');
@@ -73,16 +73,15 @@ class UserAgentCenterRegisterLinkAction
         }
 
         //开户链接
-        $frontUrl = configure('web_fronted_url');
         $keyword = random_int(11, 99) . substr(uniqid(), 7);
-        $url = trim($frontUrl, '/') . '/register/' . $keyword;
+        $url = '/register/' . $keyword;
 
         $addData = [
             'user_id' => $userInfo->id,
             'username' => $userInfo->username,
             'prize_group' => $prize_group,
             'type' => 0,//0链接注册1扫码注册
-            'is_agent' => 0,//链接注册的用户类型：0用户1代理
+            'is_agent' => $is_agent,//链接注册的用户类型：0用户1代理
             'channel' => $channel,
             'keyword' => $keyword,
             'url' => $url,
