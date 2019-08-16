@@ -31,6 +31,7 @@ class UserAgentCenterRegisterLinkAction
         $expire = $inputDatas['expire'];
         $channel = $inputDatas['channel'];
         $prize_group = $inputDatas['prize_group'];
+        $is_agent = $inputDatas['is_agent'];
 
         //链接有效期列表
         $expire_list = configure('users_register_expire');
@@ -80,7 +81,7 @@ class UserAgentCenterRegisterLinkAction
             'username' => $userInfo->username,
             'prize_group' => $prize_group,
             'type' => 0,//0链接注册1扫码注册
-            'is_agent' => 0,//链接注册的用户类型：0用户1代理
+            'is_agent' => $is_agent,//链接注册的用户类型：0用户1代理
             'channel' => $channel,
             'keyword' => $keyword,
             'url' => $url,
