@@ -169,7 +169,9 @@ class FrontendAuthRegisterAction
             $FrontendUsersSpecificInfo->save();
             $inputDatas['user_specific_id'] = $FrontendUsersSpecificInfo->id;
             $user = $this->model::create($inputDatas);
-            $rid .= '|' . $user->id;
+            
+            $rid != '' && $rid .= '|';
+            $rid .= $user->id;
             $user->rid = $rid;
 
             //账户信息

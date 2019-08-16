@@ -3,7 +3,6 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\User\FrontendUsersRegisterableLink;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -73,9 +72,8 @@ class UserAgentCenterRegisterLinkAction
         }
 
         //开户链接
-        $frontUrl = configure('web_fronted_url');
         $keyword = random_int(11, 99) . substr(uniqid(), 7);
-        $url = trim($frontUrl, '/') . '/register/' . $keyword;
+        $url = '/register/' . $keyword;
 
         $addData = [
             'user_id' => $userInfo->id,

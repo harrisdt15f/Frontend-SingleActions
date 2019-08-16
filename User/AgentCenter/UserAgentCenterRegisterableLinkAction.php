@@ -4,7 +4,9 @@ namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\User\FrontendUsersRegisterableLink;
+use App\Models\User\FrontendLinksRegisteredUsers;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class UserAgentCenterRegisterableLinkAction
 {
@@ -44,7 +46,7 @@ class UserAgentCenterRegisterableLinkAction
         }
 
         //有效开户链接
-        $data['links'] = $this->model->where('status', 1)
+        $links = $this->model->where('status', 1)
             ->where('user_id', $userInfo->id)
             ->where(
                 function ($query) {
@@ -53,7 +55,36 @@ class UserAgentCenterRegisterableLinkAction
             )
             ->select('id', 'prize_group', 'valid_days', 'is_agent', 'channel', 'created_count', 'url', 'created_at')
             ->orderBy('expired_at', 'desc')
-            ->paginate($count);
+            ->paginate($count)->toArray();
+
+
+        $linkIds = [];
+        $linkCounts = [];
+        if ($links['total'] > 0) {
+            foreach ($links['data'] as $link) {
+                $linkIds[] = $link['id'];
+            }
+
+            $registeredUsers = FrontendLinksRegisteredUsers::whereIn('register_link_id', $linkIds)
+                ->select('register_link_id', DB::raw('count(register_link_id) as count'))
+                ->groupBy('register_link_id')
+                ->get()
+                ->toArray();
+
+            foreach ($registeredUsers as $lc) {
+                $linkCounts[$lc['register_link_id']] = $lc;
+            }
+        }
+
+        foreach ($links['data'] as &$value) {
+            if (isset($linkCounts[$value['id']])) {
+                $value['register_count'] = $link['id'];
+            } else {
+                $value['register_count'] = 0;
+            }
+        }
+
+        $data['links'] = $links;
 
         return $contll->msgOut(true, $data);
     }
