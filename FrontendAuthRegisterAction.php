@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\DB;
 class FrontendAuthRegisterAction
 {
     protected $model;
-
     /**
      * FrontendAuthRegisterAction constructor.
      * @param FrontendUser $frontendUser
@@ -72,7 +71,6 @@ class FrontendAuthRegisterAction
             isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
             $inputDatas['type'] = 3;//用户类型你:1 直属2代理3会员
         }
-
 
         //1.人工开户注册
         if ($registerType == 1) {
@@ -140,7 +138,6 @@ class FrontendAuthRegisterAction
             return $contll->msgOut(false, [], '100020');
         }
 
-
         //验证平台信息是否存在
         $platform = SystemPlatform::where('platform_id', $inputDatas['platform_id'])
             ->where('platform_sign', $inputDatas['platform_sign'])
@@ -174,14 +171,7 @@ class FrontendAuthRegisterAction
         //插入信息
         DB::beginTransaction();
         try {
-            //附属信息
-            $FrontendUsersSpecificInfo = new FrontendUsersSpecificInfo();
-            $SpecificInfo = [
-                'register_type' => $registerType,
-            ];
-            $FrontendUsersSpecificInfo = $FrontendUsersSpecificInfo->fill($SpecificInfo);
-            $FrontendUsersSpecificInfo->save();
-            $inputDatas['user_specific_id'] = $FrontendUsersSpecificInfo->id;
+            //   $inputDatas['user_specific_id'] = $FrontendUsersSpecificInfo->id;
             $user = $this->model::create($inputDatas);
 
             $rid != '' && $rid .= '|';
@@ -212,6 +202,19 @@ class FrontendAuthRegisterAction
                 $registeredUser->save();
             }
 
+            //附属信息
+            $FrontendUsersSpecificInfo = new FrontendUsersSpecificInfo();
+            $SpecificInfo = [
+                'register_type' => $registerType,
+                'user_id' => $user->id,
+            ];
+            $FrontendUsersSpecificInfo = $FrontendUsersSpecificInfo->fill($SpecificInfo);
+            $FrontendUsersSpecificInfo->save();
+            //维护该字段，防止其他报错
+            $user->update([
+                'user_specific_id' => $FrontendUsersSpecificInfo->id
+            ]);
+            self::updateTotalMembers($user);
             DB::commit();
             $data['name'] = $user->username;
 
@@ -228,7 +231,6 @@ class FrontendAuthRegisterAction
                     'expires_at' => $expireAt,
                 ];
             }
-
             return $contll->msgOut(true, $data);
         } catch (Exception $e) {
             DB::rollBack();
@@ -236,5 +238,24 @@ class FrontendAuthRegisterAction
             [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
             return $contll->msgOut(false, [], $sqlState, $msg);
         }
+    }
+
+    private function updateTotalMembers($newUser)
+    {
+        $res = array(
+            'status' => true
+        );
+        //判断是否有Rid
+        if (is_null($newUser->rid) || empty($newUser->rid)) {
+            return $res;//没有rid 无需修改
+        }
+        $rid = str_replace('|', ',', trim($newUser->rid));
+        $rid = trim(str_replace($newUser->id, '', $rid), ',');
+        $rid = explode(',', $rid);
+        DB::table('frontend_users_specific_infos')
+            ->whereIn('user_id', $rid)
+            ->increment('total_members', 1);
+        DB::commit();
+        return $res;
     }
 }
