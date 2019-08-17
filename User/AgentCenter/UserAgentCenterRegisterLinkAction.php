@@ -34,7 +34,7 @@ class UserAgentCenterRegisterLinkAction
         $is_agent = $inputDatas['is_agent'];
 
         //链接有效期列表
-        $expire_list = configure('users_register_expire');
+        $expire_list = configure('users_register_expire', "[0,1,7,30,90]");
         $expire_list = json_decode($expire_list, true);
 
         if (!in_array($expire, $expire_list)) {
