@@ -27,7 +27,7 @@ class UserFundAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $contll->inputs['user_id'] = $contll->partnerUser->id;
-        $searchAbleFields = ['type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
+        $searchAbleFields = ['user_id', 'type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
         $fixedJoin = 1; //number of joining tables
         $withTable = 'gameMethods';
         $withSearchAbleFields = [];

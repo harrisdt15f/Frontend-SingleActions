@@ -19,10 +19,11 @@ class FrontendAuthUserDetailAction
         $account = $user->account;
         $balance = $account->balance;
         $frozen = $account->frozen;
+        $minPrizeGroup = $contll->betPrizeGroupArr['min_bet_prize_group'] ?? 0; //最低奖金组
         $data = [
             'user_id' => $user->id,
             'username' => $user->username,
-            'min_prize_group' => $contll->currentPlatformEloq->prize_group_min,
+            'min_prize_group' => $minPrizeGroup,
             'prize_group' => $user->prize_group,
             'user_type' => $user->type,
             'is_tester' => $user->is_tester,
@@ -39,7 +40,7 @@ class FrontendAuthUserDetailAction
             'max_profit_bonus' => configure('max_profit_bonus'),
             'download_url' => configure('app_download_url') . '/' . $user->invite_code,
             'version' => configure('app_version'),
-            'pic_path'=>$user->pic_path
+            'pic_path' => $user->pic_path,
         ];
         return $contll->msgOut(true, $data);
     }
