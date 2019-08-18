@@ -102,7 +102,17 @@ class LotteriesBetAction
             }
             // 单价花费
             $singleCost = $mode * $times * $item['price'] * $item['count'];
-            $_totalCost += $singleCost;
+            if ((int)$inputDatas['is_trace'] === 1) {
+                $i = 0;
+                foreach ($inputDatas['trace_issues'] as $traceMultiple) {
+                    /*if ($i++ < 1) {
+                        continue;
+                    }*/
+                    $_totalCost += $traceMultiple * $singleCost;
+                }
+            }else{
+                $_totalCost += $singleCost;
+            }
             $float = (float)$item['cost'];
             if (pack('f', $singleCost) !== pack('f', $float)) { //因为前端有多种传送 所以不能用三等
                 return $contll->msgOut(false, [], '100306');
@@ -118,16 +128,6 @@ class LotteriesBetAction
                 'total_price' => $singleCost,
                 'code' => $item['codes'],
             ];
-            if ((int)$inputDatas['is_trace'] === 1) {
-                $i = 0;
-                $_totalCost = 0;
-                foreach ($inputDatas['trace_issues'] as $traceMultiple) {
-                    /*if ($i++ < 1) {
-                        continue;
-                    }*/
-                    $_totalCost += $traceMultiple * $singleCost;
-                }
-            }
             //######################################
         }
         $fTotalCost = (float)$_totalCost;
