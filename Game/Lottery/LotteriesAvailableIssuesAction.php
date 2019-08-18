@@ -54,6 +54,7 @@ class LotteriesAvailableIssuesAction
             'issueInfo' => $canBetIssueData,
             'currentIssue' => $currentIssue,
             'lastIssue' => $lastIssue,
+            'serverTime'=> time(),
         ];
         return $contll->msgOut(true, $data);
     }
