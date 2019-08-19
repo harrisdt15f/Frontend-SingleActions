@@ -19,7 +19,7 @@ class FrontendAuthUserDetailAction
         $account = $user->account;
         $balance = $account->balance;
         $frozen = $account->frozen;
-        $minPrizeGroup = $contll->betPrizeGroupArr['min_bet_prize_group'] ?? 0; //最低奖金组
+        $minPrizeGroup = $contll->minClassicPrizeGroup; //最低奖金组
         $data = [
             'user_id' => $user->id,
             'username' => $user->username,
