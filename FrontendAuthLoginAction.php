@@ -37,16 +37,16 @@ class FrontendAuthLoginAction
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
         /*if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-            $seconds = $this->limiter()->availableIn(
-                $this->throttleKey($request)
-            );
-            return $contll->msgOut(false, [], '100005');
+        $this->fireLockoutEvent($request);
+        $seconds = $this->limiter()->availableIn(
+        $this->throttleKey($request)
+        );
+        return $contll->msgOut(false, [], '100005');
         }*/
         if (!$token = $contll->currentAuth->attempt($credentials)) {
             return $contll->msgOut(false, [], '100002');
         }
-        if($contll->currentAuth->user()->frozen_type==1){
+        if ($contll->currentAuth->user()->frozen_type == 1) {
             return $contll->msgOut(false, [], '100014');
         }
 
@@ -78,15 +78,17 @@ class FrontendAuthLoginAction
         ];
         return $contll->msgOut(true, $data);
     }
-    protected function throttleKey(Request $request): ?string
+    protected function throttleKey(Request $request):  ? string
     {
         if ($this->userAgent->isDesktop()) {
-            return Str::lower($request->input($this->username())).'|Desktop|'.$request->ip();
+            return Str::lower($request->input($this->username())) . '|Desktop|' . $request->ip();
         } else {
-            return Str::lower($request->input($this->username())).'|'.$this->userAgent->device().'|'.$request->ip();
+            return Str::lower($request->input($this->username())) .
+            '|' . $this->userAgent->device() .
+            '|' . $request->ip();
         }
     }
-    protected function username(): string
+    protected function username() : string
     {
         return 'username';
     }

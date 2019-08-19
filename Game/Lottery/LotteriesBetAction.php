@@ -110,7 +110,7 @@ class LotteriesBetAction
                     }*/
                     $_totalCost += $traceMultiple * $singleCost;
                 }
-            }else{
+            } else {
                 $_totalCost += $singleCost;
             }
             $float = (float)$item['cost'];

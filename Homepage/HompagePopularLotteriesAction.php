@@ -35,5 +35,4 @@ class HompagePopularLotteriesAction
         }
         return $contll->msgOut(true, $datas);
     }
-
 }

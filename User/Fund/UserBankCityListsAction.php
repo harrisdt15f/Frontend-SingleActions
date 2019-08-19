@@ -16,7 +16,10 @@ class UserBankCityListsAction
      */
     public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
-        $data = UsersRegion::select('id', 'region_id', 'region_name')->where('region_parent_id', $inputDatas['region_parent_id'])->get()->toArray();
+        $data = UsersRegion::select('id', 'region_id', 'region_name')
+            ->where('region_parent_id', $inputDatas['region_parent_id'])
+            ->get()
+            ->toArray();
         return $contll->msgOut(true, $data);
     }
 }

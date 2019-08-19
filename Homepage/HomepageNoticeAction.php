@@ -62,7 +62,15 @@ class HomepageNoticeAction
         $withSearchAbleFields = ['type'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $messages = $contll->generateSearchQuery($eloqM, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $messages = $contll->generateSearchQuery(
+            $eloqM,
+            $searchAbleFields,
+            $fixedJoin,
+            $withTable,
+            $withSearchAbleFields,
+            $orderFields,
+            $orderFlow
+        );
         $data['message'] = $messages;
         $data['unread_num'] = $messages->where('status', 0)->count();
         return $data;

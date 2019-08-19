@@ -33,7 +33,15 @@ class UserFundAction
         $withSearchAbleFields = [];
         $orderFields = 'created_at';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($this->model, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery(
+            $this->model,
+            $searchAbleFields,
+            $fixedJoin,
+            $withTable,
+            $withSearchAbleFields,
+            $orderFields,
+            $orderFlow
+        );
         return $contll->msgOut(true, $data);
     }
 }

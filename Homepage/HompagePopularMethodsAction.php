@@ -32,10 +32,10 @@ class HompagePopularMethodsAction
         if ($lotteriesEloq === null || $lotteriesEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        $popularMethodListEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')->limit($lotteriesEloq->show_num)->with([
-            'method',
-            'currentIssue:lottery_id,issue,end_time',
-        ])->get();
+        $popularMethodListEloq = FrontendLotteryFnfBetableList::orderBy('sort', 'asc')
+            ->limit($lotteriesEloq->show_num)
+            ->with(['method', 'currentIssue:lottery_id,issue,end_time'])
+            ->get();
         $datas = [];
         foreach ($popularMethodListEloq as $methodItem) {
             $data = [
@@ -52,5 +52,4 @@ class HompagePopularMethodsAction
         }
         return $contll->msgOut(true, $datas);
     }
-
 }

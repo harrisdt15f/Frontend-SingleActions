@@ -7,9 +7,7 @@ use Illuminate\Http\JsonResponse;
 
 class UserBonusAction
 {
-    protected $model ;
-
-
+    protected $model;
 
     public function __construct(UserBonus $userBonus)
     {
@@ -30,24 +28,23 @@ class UserBonusAction
         $dateTo = $request->input('date') ?? date('Y-m-d');
         $count = $request->input('count') ?? 15;
 
-        $userInfo = $contll->currentAuth->user() ;
+        $userInfo = $contll->currentAuth->user();
 
         $where = [['parent_user_id', $userInfo->id], ['period', '=', $dateTo]];
 
-        if(!empty($username)){
-            $where = array_merge([['username', $username]],$where) ;
+        if (!empty($username)) {
+            $where = array_merge([['username', $username]], $where);
         }
 
         //自己
 
         $data['self'] = $this->model->where([
             ['period', '=', $dateTo],
-            ['user_id', $userInfo->id]
+            ['user_id', $userInfo->id],
         ])->first();
 
         //下级
         $data['child'] = $this->model->where($where)->paginate($count);
-
 
         return $contll->msgOut(true, $data);
     }
