@@ -20,8 +20,10 @@ class LotteriesLastIssuesAction
         $data = [
             'lottery_id' => $lotteryIssue->lottery_id ?? null,
             'lottery_name' => $lotteryIssue->lottery_name ?? null,
+            'issue' => $lotteryIssue->issue ?? null,
             'official_code' => $lotteryIssue->official_code ?? null,
             'encode_time' => $lotteryIssue->encode_time ?? null,
+            'serverTime'=> time(),
         ];
         return $contll->msgOut(true, $data);
     }
