@@ -9,10 +9,10 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\Common\CacheRelated;
 use App\Models\Admin\Homepage\FrontendPageBanner;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HompageBannerAction
 {
@@ -34,14 +34,14 @@ class HompageBannerAction
      */
     public function execute(FrontendApiMainController $contll, $flag): JsonResponse
     {
-        $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
         $status = FrontendAllocatedModel::select('status')->where('en_name', 'banner')->first();
         if ($status === null || $status->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has($cacheName)) {
-            $datas = Cache::get($cacheName);
-        } else {
+        $tags = $contll->tags;
+        $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
+        $datas = CacheRelated::getTagsCache($tags, $cacheName);
+        if ($datas === false) {
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
                 ->with('activity:id,redirect_url')
                 ->where('status', 1)
@@ -55,7 +55,7 @@ class HompageBannerAction
                 }
                 unset($datas[$key]['activity'], $datas[$key]['activity_id']);
             }
-            Cache::forever($cacheName, $datas);
+            CacheRelated::setTagsCache($tags, $cacheName, $datas);
         }
         return $contll->msgOut(true, $datas);
     }

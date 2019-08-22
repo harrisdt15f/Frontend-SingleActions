@@ -3,23 +3,12 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\Common\CacheRelated;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
-use App\Models\Admin\Homepage\FrontendPageBanner;
-use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HompagePopularLotteriesAction
 {
-    protected $model;
-
-    /**
-     * @param  FrontendAllocatedModel  $frontendAllocatedModel
-     */
-    public function __construct(FrontendAllocatedModel $frontendAllocatedModel)
-    {
-        $this->model = $frontendAllocatedModel;
-    }
 
     /**
      * 热门彩票一
@@ -28,9 +17,10 @@ class HompagePopularLotteriesAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        if (Cache::has('popular_lotteries')) {
-            $datas = Cache::get('popular_lotteries');
-        } else {
+        $tags = $contll->tags;
+        $redisKey = 'popular_lotteries';
+        $datas = CacheRelated::getTagsCache($tags, $redisKey);
+        if ($datas === false) {
             $datas = FrontendLotteryRedirectBetList::webPopularLotteriesCache();
         }
         return $contll->msgOut(true, $datas);
