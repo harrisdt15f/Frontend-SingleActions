@@ -3,7 +3,6 @@
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Lib\Common\configurationsRelated;
 use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
