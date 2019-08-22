@@ -28,8 +28,4 @@ class LotteriesTrendAction
 
         return $contll->msgOut(true, $data);
     }
-
 }
-
-
-
