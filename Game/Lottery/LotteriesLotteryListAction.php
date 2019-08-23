@@ -3,9 +3,9 @@
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\Admin\SystemConfiguration;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
+use App\Models\Game\Lottery\LotterySerie;
 
 class LotteriesLotteryListAction
 {
@@ -30,13 +30,14 @@ class LotteriesLotteryListAction
                 'max_trace_number',
                 'day_issue',
             ]);
-        $seriesConfig = config('game.main.series');
+        $seriesConfig = LotterySerie::getList();
         $data = [];
         foreach ($lotteries as $lottery) {
             if (!isset($data[$lottery->series_id])) {
                 $data[$lottery->series_id] = [
-                    'name' => $seriesConfig[$lottery->series_id],
+                    'name' => $seriesConfig[$lottery->series_id]['title'],
                     'sign' => $lottery->series_id,
+                    'price_difference' => $seriesConfig[$lottery->series_id]['price_difference'],
                     'list' => [],
                 ];
             }
