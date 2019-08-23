@@ -20,6 +20,7 @@ class FrontendAuthUserDetailAction
         $balance = $account->balance;
         $frozen = $account->frozen;
         $minPrizeGroup = $contll->minClassicPrizeGroup; //最低奖金组
+        $unreadMessageNum = $user->unreadMessageNum();
         $data = [
             'user_id' => $user->id,
             'username' => $user->username,
@@ -42,6 +43,7 @@ class FrontendAuthUserDetailAction
             'version' => configure('app_version'),
             'pic_path' => $user->pic_path,
             'fund_password' => $user->fund_password === null ? false : true,
+            'unread_message_num' => $unreadMessageNum,
         ];
         return $contll->msgOut(true, $data);
     }
