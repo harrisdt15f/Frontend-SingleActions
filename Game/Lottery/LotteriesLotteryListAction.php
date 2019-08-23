@@ -37,6 +37,7 @@ class LotteriesLotteryListAction
                 $data[$lottery->series_id] = [
                     'name' => $seriesConfig[$lottery->series_id]['title'],
                     'sign' => $lottery->series_id,
+                    'encode_splitter' => $seriesConfig[$lottery->series_id]['encode_splitter'],
                     'price_difference' => $seriesConfig[$lottery->series_id]['price_difference'],
                     'list' => [],
                 ];
