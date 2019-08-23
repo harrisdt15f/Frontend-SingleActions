@@ -19,7 +19,7 @@ class LotteriesIssueHistoryAction
         $issuesEloq = LotteryIssue::where([
             ['lottery_id', $inputDatas['lottery_sign']],
             ['status_encode', 1],
-        ])->orderBy('issue', 'desc')->limit($inputDatas['count'])->get();
+        ])->orderBy('begin_time', 'desc')->limit($inputDatas['count'])->get();
         $data = [];
         foreach ($issuesEloq as $issueEloq) {
             $data[] = [
