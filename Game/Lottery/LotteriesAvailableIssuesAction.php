@@ -51,10 +51,11 @@ class LotteriesAvailableIssuesAction
             'open_code' => $_lastIssue->official_code,
         ] : [];
         $data = [
+            'lottery' => $inputDatas['lottery_sign'],
             'issueInfo' => $canBetIssueData,
             'currentIssue' => $currentIssue,
             'lastIssue' => $lastIssue,
-            'serverTime'=> time(),
+            'serverTime' => time(),
         ];
         return $contll->msgOut(true, $data);
     }

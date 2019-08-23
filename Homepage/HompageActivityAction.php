@@ -3,10 +3,10 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\Common\CacheRelated;
 use App\Models\Admin\Activity\FrontendActivityContent;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HompageActivityAction
 {
@@ -28,14 +28,14 @@ class HompageActivityAction
      */
     public function execute(FrontendApiMainController $contll, $type): JsonResponse
     {
-        $cacheName = $type == 1 ? 'homepage_activity_hot_web' : 'homepage_activity_hot_app';
         $activityEloq = $this->model::select('show_num', 'status')->where('en_name', 'activity')->first();
         if ($activityEloq === null || $activityEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        if (Cache::has($cacheName)) {
-            $data = Cache::get($cacheName);
-        } else {
+        $tags = 'homepage';
+        $redisKey = $type == 1 ? 'homepage_activity_hot_web' : 'homepage_activity_hot_app';
+        $data = CacheRelated::getTagsCache($tags, $redisKey);
+        if ($data === false) {
             $data = FrontendActivityContent::select('id', 'title', 'content', 'preview_pic_path', 'redirect_url')
                 ->where('status', 1)
                 ->where('type', $type)
@@ -43,7 +43,7 @@ class HompageActivityAction
                 ->limit($activityEloq->show_num)
                 ->get()
                 ->toArray();
-            Cache::forever($cacheName, $data);
+            CacheRelated::setTagsCache($tags, $redisKey, $data);
         }
         return $contll->msgOut(true, $data);
     }

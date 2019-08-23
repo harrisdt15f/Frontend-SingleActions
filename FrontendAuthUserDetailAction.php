@@ -41,6 +41,7 @@ class FrontendAuthUserDetailAction
             'download_url' => configure('app_download_url') . '/' . $user->invite_code,
             'version' => configure('app_version'),
             'pic_path' => $user->pic_path,
+            'fund_password' => $user->fund_password === null ? false : true,
         ];
         return $contll->msgOut(true, $data);
     }
