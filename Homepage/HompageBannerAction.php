@@ -9,13 +9,15 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Lib\Common\CacheRelated;
+use App\Lib\BaseCache;
 use App\Models\Admin\Homepage\FrontendPageBanner;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
 
 class HompageBannerAction
 {
+    use BaseCache;
+
     protected $model;
 
     /**
@@ -40,8 +42,8 @@ class HompageBannerAction
         }
         $tags = $contll->tags;
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
-        $datas = CacheRelated::getTagsCache($tags, $cacheName);
-        if ($datas === false) {
+        $datas = self::getCacheData($cacheName);
+        if (empty($datas)) {
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
                 ->with('activity:id,redirect_url')
                 ->where('status', 1)
@@ -55,7 +57,7 @@ class HompageBannerAction
                 }
                 unset($datas[$key]['activity'], $datas[$key]['activity_id']);
             }
-            CacheRelated::setTagsCache($tags, $cacheName, $datas);
+            self::saveCacheData($cacheName, $datas);
         }
         return $contll->msgOut(true, $datas);
     }
