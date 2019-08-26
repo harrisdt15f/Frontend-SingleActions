@@ -29,7 +29,7 @@ class UserFundAction
         $contll->inputs['user_id'] = $contll->partnerUser->id;
         $searchAbleFields = ['user_id', 'type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
         $fixedJoin = 1; //number of joining tables
-        $withTable = 'gameMethods:method_id,method_name';
+        $withTable = ['gameMethods:method_id,method_name','lottery:cn_name,en_name'];
         $withSearchAbleFields = [];
         $orderFields = 'created_at';
         $orderFlow = 'desc';
