@@ -18,7 +18,7 @@ class HompagePopularLotteriesAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $datas = self::getCacheData('lottery_popular_lotteries_web');
+        $datas = self::getTagsCacheData('lottery_popular_lotteries_web');
         if (empty($datas)) {
             $datas = FrontendLotteryRedirectBetList::webPopularLotteriesCache();
         }

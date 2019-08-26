@@ -42,7 +42,7 @@ class HompageBannerAction
         }
         $tags = $contll->tags;
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
-        $datas = self::getCacheData($cacheName);
+        $datas = self::getTagsCacheData($cacheName);
         if (empty($datas)) {
             $datas = $this->model::select('id', 'title', 'pic_path', 'content', 'type', 'redirect_url', 'activity_id')
                 ->with('activity:id,redirect_url')
@@ -57,7 +57,7 @@ class HompageBannerAction
                 }
                 unset($datas[$key]['activity'], $datas[$key]['activity_id']);
             }
-            self::saveCacheData($cacheName, $datas);
+            self::saveTagsCacheData($cacheName, $datas);
         }
         return $contll->msgOut(true, $datas);
     }

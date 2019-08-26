@@ -19,7 +19,7 @@ class LotteriesLotteryInfoAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $redisKey = 'frontend_lottery_lotteryInfo';
-        $data = self::getCacheData($redisKey);
+        $data = self::getTagsCacheData($redisKey);
         if (empty($data)) {
             $data = LotteryList::lotteryInfoCache();
         }
