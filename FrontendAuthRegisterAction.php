@@ -4,12 +4,12 @@ namespace App\Http\SingleActions\Frontend;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\SystemPlatform;
-use App\Models\User\FrontendUsersRegisterableLink;
 use App\Models\User\FrontendLinksRegisteredUsers;
-use App\Models\User\UserPublicAvatar;
 use App\Models\User\FrontendUser;
-use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\FrontendUsersRegisterableLink;
 use App\Models\User\FrontendUsersSpecificInfo;
+use App\Models\User\Fund\FrontendUsersAccount;
+use App\Models\User\UserPublicAvatar;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -33,11 +33,11 @@ class FrontendAuthRegisterAction
      * 1.人工开户注册
      * 2.链接开户注册
      * 3.扫码开户注册
-     * @param FrontendApiMainController $contll
-     * @param $inputDatas
+     * @param  FrontendApiMainController $contll
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         //注册类型
         $registerType = $inputDatas['register_type'] ?? 0;
@@ -69,7 +69,7 @@ class FrontendAuthRegisterAction
             $plat = $hostPlatform[$inputDatas['host']];
             isset($plat['platform_id']) && $inputDatas['platform_id'] = $plat['platform_id'];
             isset($plat['platform_sign']) && $inputDatas['platform_sign'] = $plat['platform_sign'];
-            $inputDatas['type'] = 3;//用户类型你:1 直属2代理3会员
+            $inputDatas['type'] = 3; //用户类型你:1 直属2代理3会员
         }
 
         //1.人工开户注册
@@ -107,6 +107,7 @@ class FrontendAuthRegisterAction
         }
 
         //2.链接开户注册和扫码开户
+        $link = null;
         if ($registerType == 2 || $registerType == 3) {
             $keyword = $inputDatas['keyword'] ?? '';
 
@@ -191,7 +192,6 @@ class FrontendAuthRegisterAction
             $user->account_id = $userAccountEloq->id;
             $user->save();
 
-
             //链接开户，扫码开户
             if ($registerType == 2 || $registerType == 3) {
                 $registeredUser = new FrontendLinksRegisteredUsers;
@@ -212,7 +212,7 @@ class FrontendAuthRegisterAction
             $FrontendUsersSpecificInfo->save();
             //维护该字段，防止其他报错
             $user->update([
-                'user_specific_id' => $FrontendUsersSpecificInfo->id
+                'user_specific_id' => $FrontendUsersSpecificInfo->id,
             ]);
             self::updateTotalMembers($user);
             DB::commit();
@@ -234,28 +234,25 @@ class FrontendAuthRegisterAction
             return $contll->msgOut(true, $data);
         } catch (Exception $e) {
             DB::rollBack();
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误妈，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+            return $contll->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
     }
 
-    private function updateTotalMembers($newUser)
+    private function updateTotalMembers(FrontendUser $newUser)
     {
-        $res = array(
-            'status' => true
-        );
-        //判断是否有Rid
-        if (is_null($newUser->rid) || empty($newUser->rid)) {
-            return $res;//没有rid 无需修改
+        $res = ['status' => true];
+        if (!empty($newUser)) {
+            if (empty($newUser->rid)) { //判断是否有Rid
+                return $res; //没有rid 无需修改
+            } else {
+                $rid = str_replace('|', ',', trim($newUser->rid));
+                $rid = trim(str_replace($newUser->id, '', $rid), ',');
+                $rid = explode(',', $rid);
+                DB::table('frontend_users_specific_infos')
+                    ->whereIn('user_id', $rid)
+                    ->increment('total_members', 1);
+            }
         }
-        $rid = str_replace('|', ',', trim($newUser->rid));
-        $rid = trim(str_replace($newUser->id, '', $rid), ',');
-        $rid = explode(',', $rid);
-        DB::table('frontend_users_specific_infos')
-            ->whereIn('user_id', $rid)
-            ->increment('total_members', 1);
-        DB::commit();
         return $res;
     }
 }
