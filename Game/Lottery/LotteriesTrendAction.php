@@ -11,17 +11,17 @@ class LotteriesTrendAction
     private const TREND_RANGE = 100;//规定可取的范围
 
     /**
-     * 游戏-可用奖期
+     * 彩种走势
      * @param  FrontendApiMainController $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $lottery_id = $inputDatas['lottery_id'];
         $range = $inputDatas['range'];
         if ($range > self::TREND_RANGE) {
-            return $contll->msgOut(false, [], 100319);
+            return $contll->msgOut(false, [], '100319');
         }
 
         $data = LotteryIssue::getTrend($lottery_id, $range);

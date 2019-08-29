@@ -20,11 +20,11 @@ class LotteriesBetAction
     /**
      * 游戏-投注
      * @param  FrontendApiMainController $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      * @throws Exception
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         if ($contll->userAgent->isDesktop()) {
             $from = Project::FROM_DESKTOP;

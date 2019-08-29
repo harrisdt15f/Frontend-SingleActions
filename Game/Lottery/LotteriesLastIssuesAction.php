@@ -11,10 +11,10 @@ class LotteriesLastIssuesAction
     /**
      * 获取彩种上期的奖期
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $lotteryIssue = LotteryIssue::getPastIssue($inputDatas['lottery_sign']);
         $data = [

@@ -13,10 +13,10 @@ class FrontendAuthResetSpecificInfosAction
     /**
      * 用户设置个人信息
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $specificinfoEloq = $contll->partnerUser->specific;
         if ($specificinfoEloq === null) {

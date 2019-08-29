@@ -12,10 +12,10 @@ class LotteriesAvailableIssuesAction
     /**
      * 游戏-可用奖期
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::findBySign($lotterySign);

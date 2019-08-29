@@ -12,10 +12,10 @@ class LotteriesCancelBetAction
     /**
      * 投注撤单
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $projectEloq = Project::find($inputDatas['id']);
         if ($projectEloq->user_id !== $contll->partnerUser->id) {

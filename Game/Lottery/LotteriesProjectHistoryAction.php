@@ -11,17 +11,17 @@ class LotteriesProjectHistoryAction
     /**
      * 游戏-下注历史
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $eloqM = new Project();
         $contll->inputs['user_id'] = $contll->partnerUser->id;
         $searchAbleFields = ['user_id', 'lottery_sign', 'serial_number', 'issue', 'status'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery($eloqM, $searchAbleFields, 0, null, [], $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
 }
