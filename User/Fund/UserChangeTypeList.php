@@ -1,14 +1,9 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/5 17:11
- */
 
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\User\Fund\FrontendUsersAccountsType;
-use App\Models\User\UsersRechargeHistorie;
 use Illuminate\Http\JsonResponse;
 
 class UserChangeTypeList
@@ -16,7 +11,7 @@ class UserChangeTypeList
     protected $model;
 
     /**
-     * @param  UsersRechargeHistorie  $usersRechargeHistorie
+     * @param  FrontendUsersAccountsType  $frontendUsersAccountsType
      */
     public function __construct(FrontendUsersAccountsType $frontendUsersAccountsType)
     {
