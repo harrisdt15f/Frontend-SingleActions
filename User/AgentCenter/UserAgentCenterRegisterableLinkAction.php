@@ -3,8 +3,8 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\User\FrontendUsersRegisterableLink;
 use App\Models\User\FrontendLinksRegisteredUsers;
+use App\Models\User\FrontendUsersRegisterableLink;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +24,6 @@ class UserAgentCenterRegisterableLinkAction
     /**
      * 开户链接
      * @param FrontendApiMainController $contll
-     * @param $inputDatas
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
@@ -57,9 +56,9 @@ class UserAgentCenterRegisterableLinkAction
             ->orderBy('expired_at', 'desc')
             ->paginate($count)->toArray();
 
-
         $linkIds = [];
         $linkCounts = [];
+        $link = [];
         if ($links['total'] > 0) {
             foreach ($links['data'] as $link) {
                 $linkIds[] = $link['id'];

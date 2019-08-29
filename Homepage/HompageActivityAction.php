@@ -23,10 +23,10 @@ class HompageActivityAction
     /**
      * 首页活动列表
      * @param  FrontendApiMainController  $contll
-     * @param  $type 活动所属端 1 网页 2手机端
+     * @param  int $type 活动所属端 1 网页 2手机端
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $type): JsonResponse
+    public function execute(FrontendApiMainController $contll, int $type): JsonResponse
     {
         $activityEloq = $this->model::select('show_num', 'status')->where('en_name', 'activity')->first();
         if ($activityEloq === null || $activityEloq->status !== 1) {

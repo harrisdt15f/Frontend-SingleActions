@@ -37,18 +37,19 @@ class HompagePopularMethodsAction
             ->with(['method', 'currentIssue:lottery_id,issue,end_time'])
             ->get();
         $datas = [];
-        foreach ($popularMethodListEloq as $methodItem) {
-            $data = [
-                'lotteries_id' => $methodItem->lotteries_id,
-                'method_id' => $methodItem->method_id,
-                'lottery_name' => $methodItem->method->lottery_name,
-                'method_name' => $methodItem->method->method_name,
-                'method_group' => $methodItem->method->method_group,
-                'method_id' => $methodItem->method->method_id,
-                'issue' => $methodItem->currentIssue->issue ?? null,
-                'end_time' => $methodItem->currentIssue->end_time ?? null,
-            ];
-            $datas[] = $data;
+        if ($popularMethodListEloq->count() > 0) {
+            foreach ($popularMethodListEloq as $methodItem) {
+                $data = [
+                    'lotteries_id' => $methodItem->lotteries_id,
+                    'lottery_name' => $methodItem->method->lottery_name,
+                    'method_name' => $methodItem->method->method_name,
+                    'method_group' => $methodItem->method->method_group,
+                    'method_id' => $methodItem->method->method_id,
+                    'issue' => $methodItem->currentIssue->issue ?? null,
+                    'end_time' => $methodItem->currentIssue->end_time ?? null,
+                ];
+                $datas[] = $data;
+            }
         }
         return $contll->msgOut(true, $datas);
     }

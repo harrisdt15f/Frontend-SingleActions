@@ -2,6 +2,7 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\UserAgentCenter\UserProfitsRequest;
 use App\Models\Project;
 use App\Models\User\FrontendUser;
 use App\Models\User\UserProfits;
@@ -33,11 +34,11 @@ class UserProfitsAction
 
     /**
      * 团队盈亏api
-     * @param FrontendApiMainController $contll
-     * @param $request
+     * @param  FrontendApiMainController $contll
+     * @param  UserProfitsRequest $request
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $request): JsonResponse
+    public function execute(FrontendApiMainController $contll, UserProfitsRequest $request): JsonResponse
     {
         $data = [];
         $sum = (object) [];

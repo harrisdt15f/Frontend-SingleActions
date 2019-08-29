@@ -32,6 +32,7 @@ class HompageBannerAction
     /**
      * 首页轮播图列表
      * @param  FrontendApiMainController  $contll
+     * @param  int  $flag
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll, $flag): JsonResponse
@@ -40,7 +41,6 @@ class HompageBannerAction
         if ($status === null || $status->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
-        $tags = $contll->tags;
         $cacheName = $flag == 1 ? 'homepage_banner_web' : 'homepage_banner_app';
         $datas = self::getTagsCacheData($cacheName);
         if (empty($datas)) {

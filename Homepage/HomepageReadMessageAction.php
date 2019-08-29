@@ -11,10 +11,10 @@ class HomepageReadMessageAction
     /**
      * 站内信 已读处理
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $messageELoq = FrontendMessageNotice::find($inputDatas['id']);
         if ($messageELoq->receive_user_id !== $contll->partnerUser->id) {

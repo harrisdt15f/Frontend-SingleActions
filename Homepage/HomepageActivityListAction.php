@@ -22,16 +22,17 @@ class HomepageActivityListAction
 
     /**
      * 活动列表
-     * @param FrontendApiMainController $contll
+     * @param  FrontendApiMainController $contll
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $contll->inputs['type'] = $inputDatas['type'];
         $searchAbleFields = ['title', 'type', 'id', 'status', 'admin_name', 'is_time_interval'];
         $orderFields = 'sort';
         $orderFlow = 'asc';
-        $datas = $contll->generateSearchQuery($this->model, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
+        $datas = $contll->generateSearchQuery($this->model, $searchAbleFields, 0, null, [], $orderFields, $orderFlow);
         return $contll->msgOut(true, $datas);
     }
 }

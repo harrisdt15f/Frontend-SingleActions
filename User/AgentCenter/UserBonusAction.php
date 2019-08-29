@@ -2,6 +2,7 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Http\Requests\Frontend\UserAgentCenter\UserBonusRequest;
 use App\Models\User\UserBonus;
 use Illuminate\Http\JsonResponse;
 
@@ -16,11 +17,11 @@ class UserBonusAction
 
     /**
      * 代理分红api
-     * @param FrontendApiMainController $contll
-     * @param $request
+     * @param  FrontendApiMainController $contll
+     * @param  UserBonusRequest $request
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $request): JsonResponse
+    public function execute(FrontendApiMainController $contll, UserBonusRequest $request): JsonResponse
     {
         $data = [];
 

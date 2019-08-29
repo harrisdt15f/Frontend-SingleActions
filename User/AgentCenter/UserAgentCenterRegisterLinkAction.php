@@ -92,7 +92,10 @@ class UserAgentCenterRegisterLinkAction
 
         if ($expire > 0) {
             $addData['valid_days'] = $expire;
-            $addData['expired_at'] = date('Y-m-d H:i:s', strtotime("+ {$expire} days"));
+            $expiredAt = strtotime("+ {$expire} days");
+            if ($expiredAt !== false) {
+                $addData['expired_at'] = date('Y-m-d H:i:s', $expiredAt);
+            }
         }
 
         try {
