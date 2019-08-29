@@ -2,7 +2,7 @@
 
 namespace App\Http\SingleActions\Frontend;
 
-use App\Http\Controllers\FrontendApi\FrontendAuthController;
+use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use Exception;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -19,14 +19,14 @@ class FrontendAuthLoginAction
     private $userAgent;
     private $maxAttempts;
     private $decayMinutes;
-    
+
     /**
      * Login user and create token
-     * @param  FrontendAuthController  $contll
-     * @param  Request $request
+     * @param  FrontendApiMainController  $contll
+     * @param  Request  $request
      * @return JsonResponse
      */
-    public function execute(FrontendAuthController $contll, Request $request): JsonResponse
+    public function execute(FrontendApiMainController $contll, Request $request): JsonResponse
     {
         $this->userAgent = $contll->userAgent;
         $request->validate([
