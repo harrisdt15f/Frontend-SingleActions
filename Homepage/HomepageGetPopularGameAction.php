@@ -3,7 +3,7 @@
 namespace App\Http\SingleActions\Frontend\Homepage;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Lib\Common\CacheRelated;
+use App\Lib\BaseCache;
 use App\Models\Admin\Homepage\FrontendLotteryRedirectBetList;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use App\Models\Game\ChessCards\FrontendPopularChessCardsList;
@@ -12,6 +12,8 @@ use Illuminate\Http\JsonResponse;
 
 class HomepageGetPopularGameAction
 {
+    use BaseCache;
+
     protected $model;
 
     /**
@@ -29,42 +31,40 @@ class HomepageGetPopularGameAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        //########################需要处理放到一个缓存里########################
-        // $redisKey = 'popular_game';
-        // if (Cache::has($redisKey)) {
-        //     $data = Cache::get($redisKey);
-        // } else {
         $data = [];
-        $tags = 'homepage';
+
         //热门彩种
-        $lotteryRedisKey = 'popular_lotteries';
-        $data['lotteries'] = CacheRelated::getTagsCache($tags, $lotteryRedisKey);
-        if ($data['lotteries'] === false) {
+        $lotteryRedisKey = 'homepage_popular_lotteries';
+        $data['lotteries'] = self::getTagsCacheData($lotteryRedisKey);
+        if (empty($data['lotteries'])) {
             $data['lotteries'] = FrontendLotteryRedirectBetList::webPopularLotteriesCache();
         }
+
         //热门棋牌
-        $chessCardsRedisKey = 'chess_cards';
-        $data['chess_cards'] = CacheRelated::getTagsCache($tags, $chessCardsRedisKey);
-        if ($data['chess_cards'] === false) {
+        $chessCardsRedisKey = 'homepage_chess_cards';
+        $data['chess_cards'] = self::getTagsCacheData($chessCardsRedisKey);
+        if (empty($data['chess_cards'])) {
             $data['chess_cards'] = FrontendPopularChessCardsList::select('chess_card_id', 'name', 'icon')
                 ->orderBy('sort', 'asc')
                 ->get()
                 ->toArray();
-            CacheRelated::setTagsCache($tags, $chessCardsRedisKey, $data['chess_cards']);
+            self::saveTagsCacheData($chessCardsRedisKey, $data['chess_cards']);
         }
+
         //热门电子
-        $eGameRedisKey = 'e_game';
-        $data['e_game'] = CacheRelated::getTagsCache($tags, $eGameRedisKey);
-        if ($data['e_game'] === false) {
+        $eGameRedisKey = 'homepage_e_game';
+        $data['e_game'] = self::getTagsCacheData($eGameRedisKey);
+        if (empty($data['e_game'])) {
             $data['e_game'] = FrontendPopularEGameList::select(
                 'computer_game_id',
                 'name',
                 'icon'
-            )->orderBy('sort', 'asc')->get()->toArray();
-            CacheRelated::setTagsCache($tags, $chessCardsRedisKey, $data['e_game']);
+            )->orderBy('sort', 'asc')
+            ->get()
+            ->toArray();
+            self::saveTagsCacheData($chessCardsRedisKey, $data['e_game']);
         }
-        // Cache::forever($redisKey, $data);
-        // }
+
         return $contll->msgOut(true, $data);
     }
 }

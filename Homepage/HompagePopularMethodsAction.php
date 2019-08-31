@@ -37,7 +37,7 @@ class HompagePopularMethodsAction
             ->with(['method', 'currentIssue:lottery_id,issue,end_time'])
             ->get();
         $datas = [];
-        if ($popularMethodListEloq->count() > 0) {
+        if ($popularMethodListEloq->isNotEmpty()) {
             foreach ($popularMethodListEloq as $methodItem) {
                 $data = [
                     'lotteries_id' => $methodItem->lotteries_id,

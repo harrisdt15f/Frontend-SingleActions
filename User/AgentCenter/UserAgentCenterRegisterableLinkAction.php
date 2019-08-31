@@ -35,9 +35,9 @@ class UserAgentCenterRegisterableLinkAction
         //链接有效期列表
         $data['expire_list'] = configure('users_register_expire');
         //最低开户奖金组
-        $data['min_user_prize_group'] = configure('min_user_prize_group');
+        $data['min_user_prize_group'] = configure('min_bet_prize_group');
         //最高开户奖金组
-        $data['max_user_prize_group'] = configure('max_user_prize_group');
+        $data['max_user_prize_group'] = configure('max_bet_prize_group');
 
         $userInfo = $contll->currentAuth->user();
         if ($userInfo->prize_group < $data['max_user_prize_group']) {
@@ -48,7 +48,7 @@ class UserAgentCenterRegisterableLinkAction
         $links = $this->model->where('status', 1)
             ->where('user_id', $userInfo->id)
             ->where(
-                function ($query) {
+                static function ($query) {
                     $query->whereNull('expired_at')->orWhere('expired_at', '>=', time());
                 }
             )

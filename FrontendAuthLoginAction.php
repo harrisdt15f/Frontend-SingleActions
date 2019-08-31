@@ -23,7 +23,7 @@ class FrontendAuthLoginAction
     /**
      * Login user and create token
      * @param  FrontendApiMainController  $contll
-     * @param  Request  $request
+     * @param  Request $request
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll, Request $request): JsonResponse
@@ -51,7 +51,7 @@ class FrontendAuthLoginAction
         if (!$token = $contll->currentAuth->attempt($credentials)) {
             return $contll->msgOut(false, [], '100002');
         }
-        if ($contll->currentAuth->user()->frozen_type == 1) {
+        if ($contll->currentAuth->user()->frozen_type === 1) {
             return $contll->msgOut(false, [], '100014');
         }
 
