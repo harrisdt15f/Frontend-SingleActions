@@ -21,10 +21,10 @@ class UserBankCardDeleteAction
     /**
      * 用户删除绑定银行卡
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $bankCardEloq = $this->model::find($inputDatas['id']);
         if ($bankCardEloq->user_id != $contll->partnerUser->id) {

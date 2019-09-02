@@ -3,12 +3,14 @@
 namespace App\Http\SingleActions\Frontend\Game\Lottery;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
+use App\Lib\BaseCache;
 use App\Models\Game\Lottery\LotteryList;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class LotteriesLotteryInfoAction
 {
+    use BaseCache;
+
     /**
      * 游戏 彩种详情
      * @param  FrontendApiMainController  $contll
@@ -16,11 +18,9 @@ class LotteriesLotteryInfoAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = [];
-        $redisKey = 'frontend.lottery.lotteryInfo';
-        if (Cache::has($redisKey)) {
-            $data = Cache::get($redisKey);
-        } else {
+        $redisKey = 'frontend_lottery_lotteryInfo';
+        $data = self::getTagsCacheData($redisKey);
+        if (empty($data)) {
             $data = LotteryList::lotteryInfoCache();
         }
         return $contll->msgOut(true, $data);

@@ -3,8 +3,8 @@
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
-use App\Models\User\FrontendUsersRegisterableLink;
 use App\Models\User\FrontendLinksRegisteredUsers;
+use App\Models\User\FrontendUsersRegisterableLink;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +24,6 @@ class UserAgentCenterRegisterableLinkAction
     /**
      * 开户链接
      * @param FrontendApiMainController $contll
-     * @param $inputDatas
      * @return JsonResponse
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
@@ -36,9 +35,9 @@ class UserAgentCenterRegisterableLinkAction
         //链接有效期列表
         $data['expire_list'] = configure('users_register_expire');
         //最低开户奖金组
-        $data['min_user_prize_group'] = configure('min_user_prize_group');
+        $data['min_user_prize_group'] = configure('min_bet_prize_group');
         //最高开户奖金组
-        $data['max_user_prize_group'] = configure('max_user_prize_group');
+        $data['max_user_prize_group'] = configure('max_bet_prize_group');
 
         $userInfo = $contll->currentAuth->user();
         if ($userInfo->prize_group < $data['max_user_prize_group']) {
@@ -49,7 +48,7 @@ class UserAgentCenterRegisterableLinkAction
         $links = $this->model->where('status', 1)
             ->where('user_id', $userInfo->id)
             ->where(
-                function ($query) {
+                static function ($query) {
                     $query->whereNull('expired_at')->orWhere('expired_at', '>=', time());
                 }
             )
@@ -57,9 +56,9 @@ class UserAgentCenterRegisterableLinkAction
             ->orderBy('expired_at', 'desc')
             ->paginate($count)->toArray();
 
-
         $linkIds = [];
         $linkCounts = [];
+        $link = [];
         if ($links['total'] > 0) {
             foreach ($links['data'] as $link) {
                 $linkIds[] = $link['id'];

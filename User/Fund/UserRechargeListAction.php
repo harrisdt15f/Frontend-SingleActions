@@ -1,8 +1,4 @@
 <?php
-/**
- * @Author: Fish
- * @Date:   2019/7/5 17:11
- */
 
 namespace App\Http\SingleActions\Frontend\User\Fund;
 
@@ -33,7 +29,7 @@ class UserRechargeListAction
         $searchAbleFields = ['user_id', 'company_order_num', 'created_at', 'amount'];
         $orderFields = 'id';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($this->model, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery($this->model, $searchAbleFields, 0, null, [], $orderFields, $orderFlow);
         return $contll->msgOut(true, $data);
     }
 }

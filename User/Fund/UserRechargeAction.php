@@ -8,7 +8,6 @@ use App\Lib\Help;
 use App\Models\Finance\UserRecharge;
 use Illuminate\Http\JsonResponse;
 
-
 class UserRechargeAction
 {
     protected $model;
@@ -39,10 +38,9 @@ class UserRechargeAction
             return $contll->msgOut(0, '对不起, 测试账户不能充值!');
         }
 
-        $amount     = request('amount',      0);
-        $channel    = request('channel',     0);
-        $bankSign   = request('bank_sign',  '');
-
+        $amount = request('amount', 0);
+        $channel = request('channel', 0);
+        $bankSign = request('bank_sign', '');
 
         // 6. 检查金额输入 输入为空 或者 取整后和原值不同
         if (empty($amount) || $amount != intval($amount)) {
@@ -52,8 +50,8 @@ class UserRechargeAction
         $_amount = intval($amount); // 前台传的是元
 
         // 发起充值
-        $res = $contll->partnerUser->recharge( $_amount, $channel, $bankSign, 'ios');
-        if ( !is_array($res)) {
+        $res = $contll->partnerUser->recharge($_amount, $channel, $bankSign, 'ios');
+        if (!is_array($res)) {
             return $contll->msgOut(0, $res);
         }
 

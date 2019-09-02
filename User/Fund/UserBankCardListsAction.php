@@ -25,7 +25,20 @@ class UserBankCardListsAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = $this->model::select('id', 'bank_sign', 'bank_name', 'owner_name', 'card_number', 'branch', 'status', 'created_at', 'updated_at')->where('user_id', $contll->partnerUser->id)->get()->toArray();
+        $data = $this->model::select(
+            'id',
+            'bank_sign',
+            'bank_name',
+            'owner_name',
+            'card_number',
+            'branch',
+            'status',
+            'created_at',
+            'updated_at'
+        )
+            ->where('user_id', $contll->partnerUser->id)
+            ->get()
+            ->toArray();
         return $contll->msgOut(true, $data);
     }
 }

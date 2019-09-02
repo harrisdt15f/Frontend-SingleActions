@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\SingleActions\Frontend\User\AgentCenter;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
@@ -22,11 +21,11 @@ class UserAgentCenterLinkDelAction
 
     /**
      * 刪除鏈接
-     * @param FrontendApiMainController $contll
-     * @param $request
+     * @param  FrontendApiMainController $contll
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $id = $inputDatas['id'];
 

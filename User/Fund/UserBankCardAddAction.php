@@ -24,10 +24,10 @@ class UserBankCardAddAction
     /**
      * 用户添加绑定银行卡
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $configEloq = SystemConfiguration::where('sign', $this->numberSign)->first();
         if ($configEloq === null) {
@@ -59,9 +59,7 @@ class UserBankCardAddAction
             $bankCardEloq->save();
             return $contll->msgOut(true);
         } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+            return $contll->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
     }
 

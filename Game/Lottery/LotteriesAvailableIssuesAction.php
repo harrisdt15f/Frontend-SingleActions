@@ -12,14 +12,17 @@ class LotteriesAvailableIssuesAction
     /**
      * 游戏-可用奖期
      * @param  FrontendApiMainController  $contll
-     * @param  $inputDatas
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $lotterySign = $inputDatas['lottery_sign'];
         $lottery = LotteryList::findBySign($lotterySign);
         $canUserInfo = LotteryIssue::getCanBetIssue($lotterySign, $lottery->max_trace_number);
+        if ($canUserInfo->count() === 0) {
+            LotteryIssue::generateTodayIssue($lotterySign); //生成彩种的今日奖期
+        }
         $canBetIssueData = [];
         $currentIssue = [];
         foreach ($canUserInfo as $index => $issue) {
@@ -48,9 +51,11 @@ class LotteriesAvailableIssuesAction
             'open_code' => $_lastIssue->official_code,
         ] : [];
         $data = [
+            'lottery' => $inputDatas['lottery_sign'],
             'issueInfo' => $canBetIssueData,
             'currentIssue' => $currentIssue,
             'lastIssue' => $lastIssue,
+            'serverTime' => time(),
         ];
         return $contll->msgOut(true, $data);
     }

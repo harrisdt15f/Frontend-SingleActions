@@ -22,11 +22,11 @@ class UserAgentCenterRegisterLinkAction
 
     /**
      * 开户链接
-     * @param FrontendApiMainController $contll
-     * @param $request
+     * @param  FrontendApiMainController $contll
+     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
         $expire = $inputDatas['expire'];
         $channel = $inputDatas['channel'];
@@ -34,7 +34,7 @@ class UserAgentCenterRegisterLinkAction
         $is_agent = $inputDatas['is_agent'];
 
         //链接有效期列表
-        $expire_list = configure('users_register_expire');
+        $expire_list = configure('users_register_expire', "[0,1,7,30,90]");
         $expire_list = json_decode($expire_list, true);
 
         if (!in_array($expire, $expire_list)) {
@@ -80,8 +80,8 @@ class UserAgentCenterRegisterLinkAction
             'user_id' => $userInfo->id,
             'username' => $userInfo->username,
             'prize_group' => $prize_group,
-            'type' => 0,//0链接注册1扫码注册
-            'is_agent' => $is_agent,//链接注册的用户类型：0用户1代理
+            'type' => 0, //0链接注册1扫码注册
+            'is_agent' => $is_agent, //链接注册的用户类型：0用户1代理
             'channel' => $channel,
             'keyword' => $keyword,
             'url' => $url,
@@ -92,7 +92,10 @@ class UserAgentCenterRegisterLinkAction
 
         if ($expire > 0) {
             $addData['valid_days'] = $expire;
-            $addData['expired_at'] = date('Y-m-d H:i:s', strtotime("+ {$expire} days"));
+            $expiredAt = strtotime("+ {$expire} days");
+            if ($expiredAt !== false) {
+                $addData['expired_at'] = date('Y-m-d H:i:s', $expiredAt);
+            }
         }
 
         try {
@@ -100,9 +103,7 @@ class UserAgentCenterRegisterLinkAction
             $FrontendUsersRegisterableLink->fill($addData);
             $FrontendUsersRegisterableLink->save();
         } catch (Exception $e) {
-            $errorObj = $e->getPrevious()->getPrevious();
-            [$sqlState, $errorCode, $msg] = $errorObj->errorInfo; //［sql编码,错误码，错误信息］
-            return $contll->msgOut(false, [], $sqlState, $msg);
+            return $contll->msgOut(false, [], $e->getCode(), $e->getMessage());
         }
 
         return $contll->msgOut(true, $FrontendUsersRegisterableLink);

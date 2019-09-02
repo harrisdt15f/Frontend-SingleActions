@@ -16,29 +16,7 @@ class HompageLotteryNoticeListAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $lotteryNoticeEloq = FrontendAllocatedModel::select('status', 'show_num')->where('en_name', 'lottery.notice')->first();
-        if ($lotteryNoticeEloq === null) {
-            $lotteryNoticeEloq = FrontendAllocatedModel::createLotteryNotice();
-        }
-        if ($lotteryNoticeEloq->status !== 1) {
-            return $contll->msgOut(false, [], '100400');
-        }
-        $lotterysEloq = FrontendLotteryNoticeList::select('lotteries_id', 'status', 'sort', 'cn_name')->with('specificNewestOpenedIssue', 'lottery:en_name,icon_path,series_id')->where('status', 1)->orderBy('sort', 'asc')->limit($lotteryNoticeEloq->show_num)->get();
-        $data = [];
-        foreach ($lotterysEloq as $lotteryEloq) {
-            $issue = $lotteryEloq->specificNewestOpenedIssue->issue ?? null;
-            $officialCode = $lotteryEloq->specificNewestOpenedIssue->official_code ?? null;
-            $encodeTime = $lotteryEloq->specificNewestOpenedIssue->encode_time ?? null;
-            $data[] = [
-                'cn_name' => $lotteryEloq->cn_name,
-                'lotteries_id' => $lotteryEloq->lotteries_id,
-                'series_id' => $lotteryEloq->lottery->series_id,
-                'icon' => $lotteryEloq->lottery->icon_path,
-                'issue' => $issue,
-                'official_code' => $officialCode,
-                'encode_time' => $encodeTime,
-            ];
-        }
+        $data = FrontendLotteryNoticeList::getWebLotteryNoticeList();
         return $contll->msgOut(true, $data);
     }
 }

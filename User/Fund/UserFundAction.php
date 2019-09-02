@@ -27,13 +27,21 @@ class UserFundAction
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $contll->inputs['user_id'] = $contll->partnerUser->id;
-        $searchAbleFields = ['type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
+        $searchAbleFields = ['user_id', 'type_sign', 'lottery_id', 'method_id', 'project_id', 'issue'];
         $fixedJoin = 1; //number of joining tables
-        $withTable = 'gameMethods';
+        $withTable = ['gameMethods:method_id,method_name','lottery:cn_name,en_name'];
         $withSearchAbleFields = [];
         $orderFields = 'created_at';
         $orderFlow = 'desc';
-        $data = $contll->generateSearchQuery($this->model, $searchAbleFields, $fixedJoin, $withTable, $withSearchAbleFields, $orderFields, $orderFlow);
+        $data = $contll->generateSearchQuery(
+            $this->model,
+            $searchAbleFields,
+            $fixedJoin,
+            $withTable,
+            $withSearchAbleFields,
+            $orderFields,
+            $orderFlow
+        );
         return $contll->msgOut(true, $data);
     }
 }
