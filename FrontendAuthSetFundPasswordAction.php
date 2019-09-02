@@ -24,6 +24,10 @@ class FrontendAuthSetFundPasswordAction
         if ($inputDatas['password'] !== $inputDatas['confirm_password']) {
             return $contll->msgOut(false, [], '100008');
         }
+        //检验设置资金密码与用户密码不能一致
+        if (!Hash::check($inputDatas['password'], $contll->partnerUser->fund_password)) {
+            return $contll->msgOut(false, [], '100024');
+        }
         try {
             $partnerUserEloq = $contll->partnerUser;
             $partnerUserEloq->fund_password = Hash::make($inputDatas['password']);
