@@ -33,9 +33,9 @@ class HomepageNoticeAction
             return $contll->msgOut(false, [], '100400');
         }
         $data = [];
-        if ($contll->inputs['type'] == FrontendMessageNoticesContent::TYPE_NOTICE) {
+        if ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
             $data = $this->getNoticeList($contll);
-        } elseif ($contll->inputs['type'] == FrontendMessageNoticesContent::TYPE_MESSAGE) {
+        } elseif ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
             $data = $this->getMessageList($contll);
         }
         return $contll->msgOut(true, $data);
@@ -45,6 +45,13 @@ class HomepageNoticeAction
     public function getNoticeList($contll)
     {
         $eloqM = new FrontendMessageNoticesContent();
+        //仅查询未过期公告
+        $time = [
+            ['start_time','<=',date('Y-m-d H:i:s',time())],
+            ['end_time','>=',date('Y-m-d H:i:s',time())]
+        ];
+        $timeStr = json_encode($time);
+        $contll->inputs['time_condtions'] = $timeStr;
         $searchAbleFields = ['type'];
         $orderFields = 'id';
         $orderFlow = 'desc';

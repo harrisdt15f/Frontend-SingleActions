@@ -7,6 +7,8 @@ use App\Models\User\FrontendUsersSpecificInfo;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use App\Lib\Common\VerifyPassword;
+use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 
 class FrontendAuthSetFundPasswordAction
 {
@@ -21,11 +23,15 @@ class FrontendAuthSetFundPasswordAction
         if ($contll->partnerUser->fund_password !== null) {
             return $contll->msgOut(false, [], '100013');
         }
+        //检验设置资金密码
+        if (!empty(VerifyPassword::verifyPassword($contll,$inputDatas['password']))) {
+            return VerifyPassword::verifyPassword($contll,$inputDatas['password']);
+        }
         if ($inputDatas['password'] !== $inputDatas['confirm_password']) {
             return $contll->msgOut(false, [], '100008');
         }
         //检验设置资金密码与用户密码不能一致
-        if (!Hash::check($inputDatas['password'], $contll->partnerUser->password)) {
+        if (Hash::check($inputDatas['password'], $contll->partnerUser->password)) {
             return $contll->msgOut(false, [], '100024');
         }
         try {

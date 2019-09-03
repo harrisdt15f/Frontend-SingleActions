@@ -39,6 +39,7 @@ class UserBankCardListsAction
             ->where('user_id', $contll->partnerUser->id)
             ->get()
             ->toArray();
+        //$cardNumber = array_column($data,'card_number');
         return $contll->msgOut(true, $data);
     }
 }
