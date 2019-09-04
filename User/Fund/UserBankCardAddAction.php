@@ -61,7 +61,7 @@ class UserBankCardAddAction
             'province_id' => $inputDatas['province_id'],
             'city_id' => $inputDatas['city_id'],
             'branch' => $inputDatas['branch'],
-            'status' => $this->model::NATURAL_STATUS,
+            'status' => $this->model::INITIALIZATION_STATUS,
         ];
         try {
             $bankCardEloq = $this->model;
