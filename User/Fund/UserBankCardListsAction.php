@@ -38,7 +38,9 @@ class UserBankCardListsAction
                 'card_number',
                 'city_id',
                 'branch',
-                'status'
+                'status',
+                'created_at',
+                'updated_at',
             ])
             ->makeHidden(['card_number'])
             ->toArray();
