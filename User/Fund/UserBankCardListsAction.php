@@ -30,7 +30,6 @@ class UserBankCardListsAction
             'bank_sign',
             'bank_name',
             'owner_name',
-            'card_number',
             'branch',
             'status',
             'created_at',
@@ -39,7 +38,9 @@ class UserBankCardListsAction
             ->where('user_id', $contll->partnerUser->id)
             ->get()
             ->toArray();
-        //$cardNumber = array_column($data,'card_number');
+        foreach ($data as &$item) {
+            $item['card_number'] = $this->model::find($item['id'])->card_num;
+        }
         return $contll->msgOut(true, $data);
     }
 }
