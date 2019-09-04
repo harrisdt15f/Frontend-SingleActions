@@ -279,7 +279,7 @@ class LotteriesBetAction
                     'project_id' => $item['id'],
                     'issue' => $currentIssue->issue,
                 ];
-                $result = $account->operateAccount($params, 'bet_cost');
+                $result = $account->operateAccount($params, $item['account_type']);
                 if ($result !== true) {
                     DB::rollBack();
                     return $this->contll->msgOut(false, [], '', $result);
