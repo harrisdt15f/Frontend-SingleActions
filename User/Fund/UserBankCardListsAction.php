@@ -33,6 +33,7 @@ class UserBankCardListsAction
             'rid',
             'bank_sign',
             'bank_name',
+            'card_number',
             'owner_name',
             'province_id',
             'city_id',
