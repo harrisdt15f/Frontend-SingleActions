@@ -27,20 +27,21 @@ class UserBankCardListsAction
     {
         $data = $this->model::select(
             'id',
+            'user_id',
+            'parent_id',
+            'top_id',
+            'rid',
             'bank_sign',
             'bank_name',
             'owner_name',
+            'province_id',
+            'city_id',
             'branch',
             'status',
-            'created_at',
-            'updated_at'
         )
             ->where('user_id', $contll->partnerUser->id)
             ->get()
             ->toArray();
-        foreach ($data as &$item) {
-            $item['card_number'] = $this->model::find($item['id'])->card_num;
-        }
         return $contll->msgOut(true, $data);
     }
 }
