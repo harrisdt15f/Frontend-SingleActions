@@ -38,6 +38,16 @@ class UserBankCardAddAction
         if ($nowNumber >= $maxNumber) {
             return $contll->msgOut(false, [], '100202');
         }
+        //检验当前用户添加的拥有者是否存在
+        $ownerName = $this->model::where([['owner_name', $inputDatas['owner_name']],['user_id',$contll->partnerUser->id]])->count();
+        if (empty($ownerName)) {
+            return $contll->msgOut(false, [], '100204');
+        }
+        //检验当前用户添加的银行卡号是否存在
+        $cardNumber = $this->model::where([['card_number', $inputDatas['card_number']],['user_id',$contll->partnerUser->id]])->count();
+        if (!empty($cardNumber)) {
+            return $contll->msgOut(false, [], '100203');
+        }
         $addData = [
             'user_id' => $contll->partnerUser->id,
             'parent_id' => $contll->partnerUser->parent_id,
@@ -51,10 +61,10 @@ class UserBankCardAddAction
             'province_id' => $inputDatas['province_id'],
             'city_id' => $inputDatas['city_id'],
             'branch' => $inputDatas['branch'],
-            'status' => $this->model::NATURAL_STATUS,
+            'status' => $this->model::INITIALIZATION_STATUS,
         ];
         try {
-            $bankCardEloq = new $this->model;
+            $bankCardEloq = $this->model;
             $bankCardEloq->fill($addData);
             $bankCardEloq->save();
             return $contll->msgOut(true);
