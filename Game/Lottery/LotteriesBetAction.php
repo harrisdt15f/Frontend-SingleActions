@@ -112,6 +112,8 @@ class LotteriesBetAction
                 'price' => $item['price'],
                 'total_price' => $singleCost,
                 'code' => $item['codes'],
+                'challenge_prize'=>$item['challenge_prize'],
+                'challenge'=>$item['challenge'],
             ];
         }
         return $betDetail;
