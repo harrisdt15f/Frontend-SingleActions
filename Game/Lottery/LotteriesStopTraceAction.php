@@ -51,28 +51,30 @@ class LotteriesStopTraceAction
         $canceledAmount = 0; //本次取消的金额
         foreach ($traceListsEloqs as $traceListsItem) {
             $issueIsNormal = $this->checkIssueNormal($traceListsItem);
-            if ($issueIsNormal[0] === true) {
+            if ($issueIsNormal['success'] === true) {
                 //取消正在追号状态的奖期需要更改project表状态
                 if ($traceListsItem->status === LotteryTraceList::STATUS_RUNNING && $traceListsItem->project_serial_number !== null) {
                     $this->saveProject($traceListsItem->project_serial_number);
                 }
                 $saveTraceList = $this->saveTraceList($traceListsItem);
-                if ($saveTraceList[0] === false) {
-                    return $contll->msgOut($saveTraceList);
+                if ($saveTraceList['success'] === false) {
+                    return $contll->msgOut($saveTraceList['success'], [], '' ,$saveTraceList['messages']);
                 }
                 $saveUserAccount = $this->saveUserAccount($user, $traceListsItem);
-                if ($saveUserAccount[0] === false) {
-                    return $contll->msgOut($saveUserAccount);
+                if ($saveUserAccount['success'] === false) {
+                    return $contll->msgOut($saveUserAccount['success'], [], $saveUserAccount['code'], $saveUserAccount['messages']);
                 }
                 $canceledNum++; //本次取消的期数
                 $canceledAmount += $traceListsItem->total_price; //本次取消的金额
             } else {
                 DB::rollBack();
-                return $contll->msgOut($issueIsNormal);
+                return $contll->msgOut($issueIsNormal['success'], [], $issueIsNormal['code'], '', $issueIsNormal['placeholder'], $issueIsNormal['substituted']);
             }
         }
         if ($canceledNum > 0) {
-            $saveTrace = $this->saveLotteryTrace($traceListsEloqs->first()->trace_id, $canceledNum, $canceledAmount, $user->id, $inputDatas);
+            $lotteryTraceEloq = $traceListsEloqs->first()->trace;
+            $this->checkTraceNormal($lotteryTraceEloq); //检查追号是否正常
+            $saveTrace = $this->saveLotteryTrace($lotteryTraceEloq, $canceledNum, $canceledAmount, $user->id, $inputDatas);
             if ($saveTrace[0] === false) {
                 return $contll->msgOut($saveTrace);
             }
@@ -84,19 +86,10 @@ class LotteriesStopTraceAction
     //检查奖期是否可以撤单
     public function checkIssueNormal($traceListsItem)
     {
-        $issue = LotteryIssue::where([
-            ['lottery_id', $traceListsItem->lottery_sign],
-            ['issue', $traceListsItem->issue],
-            ['status_encode', LotteryIssue::ENCODE_NONE],
-        ])->first();
-        if ($issue !== null) {
-            if (time() > $issue->end_time) {
-                return [false, [], '100321', '', 'issue', $traceListsItem->issue];
-            } else {
-                return [true];
-            }
+        if (time() > $traceListsItem->issue_end_time) {
+            return ['success' => false, 'code' => '100321', 'placeholder' => 'issue', 'substituted' => $traceListsItem->issue];
         } else {
-            return [false, [], '100322', '', 'issue', $traceListsItem->issue];
+            return ['success' => true];
         }
     }
 
@@ -112,9 +105,8 @@ class LotteriesStopTraceAction
         ];
     }
 
-    public function saveLotteryTrace($traceId, $canceledNum, $canceledAmount, $userId, $inputDatas)
+    public function saveLotteryTrace($lotteryTraceEloq, $canceledNum, $canceledAmount, $userId, $inputDatas)
     {
-        $lotteryTraceEloq = LotteryTrace::find($traceId); //$traceListsEloqs->first()->trace_id);
         $lotteryTraceEloq->canceled_issues += $canceledNum; //累积取消的期数
         $lotteryTraceEloq->canceled_amount += $canceledAmount; //累积取消的金额
         if ($inputDatas['type'] === $this->stopAllTraceType) {
@@ -166,9 +158,9 @@ class LotteriesStopTraceAction
         $traceListsItem->save();
         if ($traceListsItem->errors()->messages()) {
             DB::rollback();
-            return [false, [], '', $traceListsItem->errors()->messages()];
+            return ['success' => false, 'messages' => $traceListsItem->errors()->messages()];
         }
-        return [true];
+        return ['success' => true];
     }
 
     public function saveUserAccount($user, $traceListsItem)
@@ -176,14 +168,67 @@ class LotteriesStopTraceAction
         if ($user->account()->exists()) {
             $account = $user->account;
         } else {
-            return [false, [], '100313'];
+            return ['success' => false, 'code' => '100313', 'messages' =>''];
         }
         $params = $this->getAccountParams($user->id, $traceListsItem);
         $resource = $account->operateAccount($params, 'cancel_order'); //帐变处理
         if ($resource !== true) {
             DB::rollBack();
-            return [false, [], '', $resource];
+            return ['success' => false, 'code' => '', 'messages' => $resource];
         }
-        return [true];
+        return ['success' => true];
+    }
+
+    /**
+     * 如果存在等待追号状态的追号list并且没有正在追号状态的list，则需要把第一个等待状态的追号加入project表
+     * @param  LotteryTrace $lotteryTrace
+     */
+    public function checkTraceNormal(LotteryTrace $lotteryTrace)
+    {
+        $waitingTrace = $lotteryTrace->traceLists->where('status', LotteryTraceList::STATUS_WAITING)->where('issue_end_time', '>', time());
+        if ($waitingTrace->isNotEmpty()) {
+            $runningTrace = $lotteryTrace->traceLists->where('status', LotteryTraceList::STATUS_RUNNING);
+            if ($runningTrace->isEmpty()) {
+                $this->insertProject($waitingTrace->first(), $lotteryTrace);
+            }
+        }
+    }
+
+    public function insertProject($traceList, $lotteryTraceEloq)
+    {
+        $projectData = [
+            'serial_number' => Project::getProjectSerialNumber(),
+            'user_id' => $traceList->user_id,
+            'username' => $traceList->username,
+            'top_id' => $traceList->top_id,
+            'rid' => $traceList->rid,
+            'parent_id' => $traceList->parent_id,
+            'is_tester' => $traceList->is_tester,
+            'series_id' => $traceList->series_id,
+            'lottery_sign' => $traceList->lottery_sign,
+            'method_sign' => $traceList->method_sign,
+            'method_group' => $traceList->method_group,
+            'method_name' => $traceList->method_name,
+            'user_prize_group' => $traceList->user_prize_group,
+            'bet_prize_group' => $traceList->bet_prize_group,
+            'mode' => $traceList->mode,
+            'times' => $traceList->times,
+            'price' => $traceList->single_price,
+            'total_cost' => $traceList->total_price,
+            'bet_number' => $traceList->bet_number,
+            'issue' => $traceList->issue,
+            'prize_set' => $traceList->prize_set,
+            'ip' => $traceList->ip,
+            'proxy_ip' => $traceList->proxy_ip,
+            'bet_from' => $traceList->bet_from,
+            'time_bought' => time(),
+            'status_flow' => Project::STATUS_FLOW_TRACE_CANCEL,
+        ];
+        $projectId = Project::create($projectData)->id;
+        $traceList->project_id = $projectId;
+        $traceList->project_serial_number = $projectData['serial_number'];
+        $traceList->status = LotteryTraceList::STATUS_RUNNING;
+        $traceList->save();
+        $lotteryTraceEloq->now_issue = $traceList->issue;
     }
 }

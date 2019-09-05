@@ -112,6 +112,8 @@ class LotteriesBetAction
                 'price' => $item['price'],
                 'total_price' => $singleCost,
                 'code' => $item['codes'],
+                'challenge_prize'=>$item['challenge_prize'],
+                'challenge'=>$item['challenge'],
             ];
         }
         return $betDetail;
@@ -279,7 +281,7 @@ class LotteriesBetAction
                     'project_id' => $item['id'],
                     'issue' => $currentIssue->issue,
                 ];
-                $result = $account->operateAccount($params, 'bet_cost');
+                $result = $account->operateAccount($params, $item['account_type']);
                 if ($result !== true) {
                     DB::rollBack();
                     return $this->contll->msgOut(false, [], '', $result);
