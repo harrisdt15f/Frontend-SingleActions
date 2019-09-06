@@ -74,6 +74,7 @@ class LotteriesBetAction
     private function getBetDetail(array $inputDatas, LotteryList $lottery, FrontendUser $user, &$account, &$_totalCost)
     {
         $betDetail = [];
+        $prizeGroup = 0;
         foreach ($inputDatas['balls'] as $item) {
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);//已在 Request 层验证过 无需再次验证
@@ -93,14 +94,10 @@ class LotteriesBetAction
             // 单价计算
             $singleCost = $this->getSingleCost($item, $mode, $times);//模式，倍数
             //总价计算
-            $_totalCost = $this->getTotalCost($inputDatas, $singleCost);
+            $_totalCost = $this->getTotalCost($inputDatas, $singleCost, $_totalCost);
             $checkFloatStatus = $this->checkSingleCost($item, $singleCost);
             if ($checkFloatStatus !== true) {
                 return $checkFloatStatus;
-            }
-            $userCriteriasCheckStatus = $this->userCriteriasCheck($user, $prizeGroup, $_totalCost, $account);
-            if ($userCriteriasCheckStatus !== true) {
-                return $userCriteriasCheckStatus;
             }
             $betDetail[] = [
                 'method_id' => $methodId,
@@ -115,6 +112,10 @@ class LotteriesBetAction
                 'challenge_prize'=>$item['challenge_prize'],
                 'challenge'=>$item['challenge'],
             ];
+        }
+        $userCriteriasCheckStatus = $this->userCriteriasCheck($user, $prizeGroup, $_totalCost, $account);
+        if ($userCriteriasCheckStatus !== true) {
+            return $userCriteriasCheckStatus;
         }
         return $betDetail;
     }
@@ -230,9 +231,9 @@ class LotteriesBetAction
      * @param  float|int  $singleCost
      * @return float|int
      */
-    private function getTotalCost(array $inputDatas, $singleCost)
+    private function getTotalCost(array $inputDatas, $singleCost, &$_totalCost)
     {
-        $_totalCost = 0;
+        // $_totalCost = 0;
         if ((int)$inputDatas['is_trace'] === 1) {
 //            $i = 0;
             foreach ($inputDatas['trace_issues'] as $traceMultiple) {
@@ -278,13 +279,21 @@ class LotteriesBetAction
                     'amount' => $item['cost'],
                     'lottery_id' => $item['lottery_id'],
                     'method_id' => $item['method_id'],
-                    'project_id' => $item['id'],
+                    'project_id' => $item['id'] ?? null,
                     'issue' => $currentIssue->issue,
                 ];
                 $result = $account->operateAccount($params, $item['account_type']);
                 if ($result !== true) {
                     DB::rollBack();
                     return $this->contll->msgOut(false, [], '', $result);
+                }
+            }
+            //如果是追号投注,全部生成了等待状态的list,需要去进行追号
+            if ((int) $inputDatas['is_trace'] === 1) {
+                $executeTrace = LotteryIssue::handleTraceWithCurrentIssue($lottery);
+                if ($executeTrace !== true) {
+                    DB::rollBack();
+                    return $this->contll->msgOut(false, [], '100322');
                 }
             }
             DB::commit();
