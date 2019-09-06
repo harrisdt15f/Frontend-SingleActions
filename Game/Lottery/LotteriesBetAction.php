@@ -278,13 +278,21 @@ class LotteriesBetAction
                     'amount' => $item['cost'],
                     'lottery_id' => $item['lottery_id'],
                     'method_id' => $item['method_id'],
-                    'project_id' => $item['id'],
+                    'project_id' => $item['id'] ?? null,
                     'issue' => $currentIssue->issue,
                 ];
                 $result = $account->operateAccount($params, $item['account_type']);
                 if ($result !== true) {
                     DB::rollBack();
                     return $this->contll->msgOut(false, [], '', $result);
+                }
+            }
+            //如果是追号投注,全部生成了等待状态的list,需要去进行追号
+            if ((int) $inputDatas['is_trace'] === 1) {
+                $executeTrace = LotteryIssue::handleTraceWithCurrentIssue($lottery);
+                if ($executeTrace !== true) {
+                    DB::rollBack();
+                    return $this->contll->msgOut(false, [], '100322');
                 }
             }
             DB::commit();
