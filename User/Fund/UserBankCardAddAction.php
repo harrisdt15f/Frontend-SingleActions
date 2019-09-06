@@ -16,7 +16,7 @@ class UserBankCardAddAction
     protected $numberSign = 'binding_bankcard_number';
 
     /**
-     * @param  FrontendUsersBankCard  $frontendUsersBankCard
+     * @param  FrontendUsersBankCard $frontendUsersBankCard
      */
     public function __construct(FrontendUsersBankCard $frontendUsersBankCard)
     {
@@ -25,7 +25,7 @@ class UserBankCardAddAction
 
     /**
      * 用户添加绑定银行卡
-     * @param  FrontendApiMainController  $contll
+     * @param  FrontendApiMainController $contll
      * @param  array $inputDatas
      * @return JsonResponse
      */
@@ -100,11 +100,14 @@ class UserBankCardAddAction
     public function addBankVerifiy(FrontendApiMainController $contll, array $inputDatas)
     {
         $userIdNum = $this->model::where('user_id', $contll->partnerUser->id)->count();
-        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']],['user_id',$contll->partnerUser->id]])->count();
+        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']], ['user_id', $contll->partnerUser->id]])->count();
         //检验当前用户资金密码是否设置
         $funPassword = $contll->partnerUser->fund_password;
         if (!isset($funPassword)) {
             return $contll->msgOut(false, [], '100205');
+        }
+        if (!Hash::check($inputDatas['fund_password'], $contll->partnerUser->fund_password)) {
+            return $contll->msgOut(false, [], '100206');
         }
         //检验当前用户添加的拥有者是否存在
         if ($userIdNum > 0) {
@@ -112,36 +115,10 @@ class UserBankCardAddAction
                 return $contll->msgOut(false, [], '100204');
             }
         }
-        //检验当前用户银行卡数量是否大于等于1
-        if ($userIdNum >= 1) {
-            if ($this->twoAddVerifiy($contll, $ownerNameNum, $inputDatas) !== null) {
-                return $this->twoAddVerifiy($contll, $ownerNameNum, $inputDatas);
-            }
-        }
         //检验当前用户添加的银行卡号是否存在
-        $cardNumber = $this->model::where([['card_number', $inputDatas['card_number']],['user_id',$contll->partnerUser->id]])->count();
+        $cardNumber = $this->model::where([['card_number', $inputDatas['card_number']], ['user_id', $contll->partnerUser->id]])->count();
         if (!empty($cardNumber)) {
             return $contll->msgOut(false, [], '100203');
-        }
-    }
-
-    /**
-     * 二次添加检验拥有者与资金密码
-     * @param FrontendApiMainController $contll
-     * @param int $ownerNameNum
-     * @return JsonResponse
-     */
-    public function twoAddVerifiy(FrontendApiMainController $contll, $ownerNameNum, $inputDatas)
-    {
-        //检验资金密码与拥有者
-        if (empty($inputDatas['fund_password'])) {
-            return $contll->msgOut(false, [], '100208');
-        }
-        if (!Hash::check($inputDatas['fund_password'], $contll->partnerUser->fund_password)) {
-            return $contll->msgOut(false, [], '100206');
-        }
-        if ($ownerNameNum === 0) {
-            return $contll->msgOut(false, [], '100207');
         }
     }
 }
