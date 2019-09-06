@@ -33,9 +33,9 @@ class HomepageNoticeAction
             return $contll->msgOut(false, [], '100400');
         }
         $data = [];
-        if ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
+        if ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
             $data = $this->getNoticeList($contll);
-        } elseif ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
+        } elseif ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
             $data = $this->getMessageList($contll);
         }
         return $contll->msgOut(true, $data);
@@ -79,7 +79,7 @@ class HomepageNoticeAction
             $orderFlow
         );
         $data['message'] = $messages;
-        $data['unread_num'] = $messages->where('status', 0)->count();
+        $data['unread_num'] = $contll->partnerUser->unreadMessageNum(); //获取站内所有未读消息
         return $data;
     }
 }

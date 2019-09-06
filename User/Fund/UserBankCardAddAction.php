@@ -4,11 +4,11 @@ namespace App\Http\SingleActions\Frontend\User\Fund;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\Admin\SystemConfiguration;
+use App\Models\Admin\Fund\FrontendSystemBank;
 use App\Models\User\Fund\FrontendUsersBankCard;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
-use phpDocumentor\Reflection\Types\Integer;
 
 class UserBankCardAddAction
 {
@@ -106,8 +106,18 @@ class UserBankCardAddAction
         if (!isset($funPassword)) {
             return $contll->msgOut(false, [], '100205');
         }
-        if (!Hash::check($inputDatas['fund_password'], $contll->partnerUser->fund_password)) {
-            return $contll->msgOut(false, [], '100206');
+        //检验当前银行卡状态
+        $systemBankEloq = FrontendSystemBank::where('title',$inputDatas['bank_name'])->first();
+        if ($systemBankEloq !== null) {
+            if (!$systemBankEloq->status) {
+                return $contll->msgOut(false, [], '100210');
+            }
+        }
+        //检验当用户银行卡是否第二次添加
+        if ($userIdNum >= 1) {
+            if (!Hash::check($inputDatas['fund_password'], $contll->partnerUser->fund_password)) {
+                return $contll->msgOut(false, [], '100206');
+            }
         }
         //检验当前用户添加的拥有者是否存在
         if ($userIdNum > 0) {

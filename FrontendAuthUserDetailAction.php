@@ -20,7 +20,7 @@ class FrontendAuthUserDetailAction
         $balance = $account->balance;
         $frozen = $account->frozen;
         $minPrizeGroup = $contll->minClassicPrizeGroup; //最低奖金组
-        $unreadMessageNum = $user->unreadMessageNum();
+        $unreadMessageNum = $user->unreadMessageNum();//未读数量
         $data = [
             'user_id' => $user->id,
             'username' => $user->username,
