@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Game\Lottery\LotteryMethod;
 
 class LotteriesBetAction
 {
@@ -76,6 +77,11 @@ class LotteriesBetAction
         $betDetail = [];
         $prizeGroup = 0;
         foreach ($inputDatas['balls'] as $item) {
+            // 检查玩法是否存在&状态是否开启
+            $checkMethod = LotteryMethod::checkMethod($lottery->en_name, $item['method_id']);
+            if ($checkMethod === false) {
+                return $this->contll->msgOut(false, [], '100323');
+            }
             $methodId = $item['method_id'];
             $method = $lottery->getMethod($methodId);//已在 Request 层验证过 无需再次验证
             $oMethod = $method['object']; // 玩法 - 对象
@@ -93,8 +99,7 @@ class LotteriesBetAction
             }
             // 单价计算
             $singleCost = $this->getSingleCost($item, $mode, $times);//模式，倍数
-            //总价计算
-            $_totalCost = $this->getTotalCost($inputDatas, $singleCost, $_totalCost);
+            $_totalCost = $this->getTotalCost($inputDatas, $singleCost, $_totalCost);//总价计算
             $checkFloatStatus = $this->checkSingleCost($item, $singleCost);
             if ($checkFloatStatus !== true) {
                 return $checkFloatStatus;
