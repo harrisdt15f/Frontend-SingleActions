@@ -5,6 +5,7 @@ namespace App\Http\SingleActions\Frontend;
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use Illuminate\Http\JsonResponse;
 use App\Lib\Common\VerifyPassword;
+use App\Lib\Common\VerifyFundPassword;
 use Illuminate\Support\Facades\Hash;
 
 class FrontendCommonHandleUserPasswordAction
@@ -22,8 +23,12 @@ class FrontendCommonHandleUserPasswordAction
             return $contll->msgOut(false, [], '100007');
         }
         //检验设置密码
-        if (!empty(VerifyPassword::verifyPassword($contll,$inputDatas['new_password']))) {
-            return VerifyPassword::verifyPassword($contll,$inputDatas['new_password']);
+        if ($type === 1 && VerifyPassword::verifyPassword($contll,$inputDatas['new_password'],2)) {
+            return VerifyPassword::verifyPassword($contll,$inputDatas['new_password'],2);
+        }
+        //检验设置资金密码
+        if ($type === 2 && VerifyFundPassword::verifyFundPassword($contll, $inputDatas['new_password'], 2)) {
+            return VerifyFundPassword::verifyFundPassword($contll,$inputDatas['new_password'],2);
         }
         if ($inputDatas['new_password'] !== $inputDatas['confirm_password']) {
             return $contll->msgOut(false, [], '100008');

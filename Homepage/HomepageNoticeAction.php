@@ -7,7 +7,6 @@ use App\Models\Admin\Notice\FrontendMessageNotice;
 use App\Models\Admin\Notice\FrontendMessageNoticesContent;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HomepageNoticeAction
 {
@@ -52,7 +51,8 @@ class HomepageNoticeAction
         ];
         $timeStr = json_encode($time);
         $contll->inputs['time_condtions'] = $timeStr;
-        $searchAbleFields = ['type'];
+        $contll->inputs['status'] = FrontendMessageNoticesContent::STATUS_OPEN; //仅查询开启状态公告
+        $searchAbleFields = ['type', 'status'];
         $orderFields = 'id';
         $orderFlow = 'desc';
         return $contll->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
