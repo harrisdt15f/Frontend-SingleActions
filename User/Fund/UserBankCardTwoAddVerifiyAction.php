@@ -26,7 +26,7 @@ class UserBankCardTwoAddVerifiyAction
      */
     public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
     {
-        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']],['user_id', $contll->partnerUser->id]])->count();
+        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']],['user_id',$contll->partnerUser->id]])->count();
         if ($ownerNameNum === 0) {
             return $contll->msgOut(false, [], '100207');
         }

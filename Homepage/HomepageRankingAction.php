@@ -6,8 +6,6 @@ use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 
 class HomepageRankingAction
 {
@@ -42,7 +40,11 @@ class HomepageRankingAction
 
         //先使用假数据展示  需要改成真实数据
         //###########################################
+        $FrontendAllocatedEloq = FrontendAllocatedModel::where('en_name','winning.ranking')->first();
         $rankingData = config('game.ranking');
+        if (($FrontendAllocatedEloq !== null) && is_integer($FrontendAllocatedEloq->show_num)) {
+            $rankingData = array_slice($rankingData,0, $FrontendAllocatedEloq->show_num);
+        }
         return $contll->msgOut(true, $rankingData);
     }
 }

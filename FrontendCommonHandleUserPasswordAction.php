@@ -4,7 +4,6 @@ namespace App\Http\SingleActions\Frontend;
 
 use App\Http\Controllers\FrontendApi\FrontendApiMainController;
 use Illuminate\Http\JsonResponse;
-use App\Lib\Common\VerifyPassword;
 use Illuminate\Support\Facades\Hash;
 
 class FrontendCommonHandleUserPasswordAction
@@ -18,28 +17,18 @@ class FrontendCommonHandleUserPasswordAction
     public function execute(FrontendApiMainController $contll, $inputDatas, $type): JsonResponse
     {
         $targetUserEloq = $contll->eloqM::find($contll->partnerUser->id);
-        if ($inputDatas['old_password'] === $inputDatas['new_password']) {
-            return $contll->msgOut(false, [], '100007');
-        }
-        //检验设置密码
-        if (!empty(VerifyPassword::verifyPassword($contll,$inputDatas['new_password']))) {
-            return VerifyPassword::verifyPassword($contll,$inputDatas['new_password']);
-        }
-        if ($inputDatas['new_password'] !== $inputDatas['confirm_password']) {
-            return $contll->msgOut(false, [], '100008');
-        }
         if ($type === 1) {
             $field = 'password';
             $oldPassword = $targetUserEloq->password;
             //检验用户新密码与资金密码不能一致
-            if (Hash::check($inputDatas['new_password'], $targetUserEloq->fund_password)) {
+            if (Hash::check($inputDatas['password'], $targetUserEloq->fund_password)) {
                 return $contll->msgOut(false, [], '100025');
             }
         } elseif ($type === 2) {
             $field = 'fund_password';
             $oldPassword = $targetUserEloq->fund_password;
             //检验资金新密码与用户密码不能一致
-            if (Hash::check($inputDatas['new_password'], $targetUserEloq->password)) {
+            if (Hash::check($inputDatas['password'], $targetUserEloq->password)) {
                 return $contll->msgOut(false, [], '100024');
             }
         } else {
@@ -50,7 +39,7 @@ class FrontendCommonHandleUserPasswordAction
             return $contll->msgOut(false, [], '100009');
         }
         //修改密码
-        $targetUserEloq->$field = Hash::make($inputDatas['new_password']);
+        $targetUserEloq->$field = Hash::make($inputDatas['password']);
         if ($targetUserEloq->save()) {
             if ($type === 1) {
                 // $targetUserEloq->remember_token = $token;

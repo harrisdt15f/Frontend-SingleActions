@@ -7,7 +7,6 @@ use App\Models\Admin\Notice\FrontendMessageNotice;
 use App\Models\Admin\Notice\FrontendMessageNoticesContent;
 use App\Models\DeveloperUsage\Frontend\FrontendAllocatedModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class HomepageNoticeAction
 {
@@ -33,9 +32,9 @@ class HomepageNoticeAction
             return $contll->msgOut(false, [], '100400');
         }
         $data = [];
-        if ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
+        if ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
             $data = $this->getNoticeList($contll);
-        } elseif ($contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
+        } elseif ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
             $data = $this->getMessageList($contll);
         }
         return $contll->msgOut(true, $data);
@@ -52,7 +51,8 @@ class HomepageNoticeAction
         ];
         $timeStr = json_encode($time);
         $contll->inputs['time_condtions'] = $timeStr;
-        $searchAbleFields = ['type'];
+        $contll->inputs['status'] = FrontendMessageNoticesContent::STATUS_OPEN; //仅查询开启状态公告
+        $searchAbleFields = ['type', 'status'];
         $orderFields = 'id';
         $orderFlow = 'desc';
         return $contll->generateSearchQuery($eloqM, $searchAbleFields, 0, null, null, $orderFields, $orderFlow);
@@ -79,7 +79,7 @@ class HomepageNoticeAction
             $orderFlow
         );
         $data['message'] = $messages;
-        $data['unread_num'] = $messages->where('status', 0)->count();
+        $data['unread_num'] = $contll->partnerUser->unreadMessageNum(); //获取站内所有未读消息
         return $data;
     }
 }
