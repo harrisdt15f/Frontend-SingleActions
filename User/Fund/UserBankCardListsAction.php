@@ -25,7 +25,10 @@ class UserBankCardListsAction
      */
     public function execute(FrontendApiMainController $contll): JsonResponse
     {
-        $data = $this->model::where('user_id', $contll->partnerUser->id)
+        $data = $this->model::where([
+            ['user_id', $contll->partnerUser->id],
+            ['status',1] //仅查询可用银行卡
+            ])
             ->get(['id',
                 'user_id',
                 'parent_id',
