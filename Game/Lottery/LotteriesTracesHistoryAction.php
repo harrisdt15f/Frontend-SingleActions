@@ -11,17 +11,22 @@ class LotteriesTracesHistoryAction
     /**
      * 游戏-追号历史
      * @param  FrontendApiMainController  $contll
-     * @param  array $inputDatas
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll, array $inputDatas): JsonResponse
+    public function execute(FrontendApiMainController $contll): JsonResponse
     {
         $eloqM = new LotteryTrace();
         $contll->inputs['user_id'] = $contll->partnerUser->id;
         $searchAbleFields = ['user_id', 'lottery_sign', 'status'];
-        $fixedJoin = 1;
-        $withTable = ['traceLists', 'lottery:en_name,icon_path'];
-        $withSearchAbleFields = ['project_serial_number', 'issue'];
+        $fixedJoin = 2;
+        $withTable = [
+            'traceLists',
+            'lottery:en_name,icon_path'
+        ];
+        $withSearchAbleFields = [
+            ['project_serial_number', 'issue'],
+            []
+        ];
         $orderFields = 'id';
         $orderFlow = 'desc';
         $data = $contll->generateSearchQuery(
