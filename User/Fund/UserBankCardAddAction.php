@@ -99,8 +99,8 @@ class UserBankCardAddAction
      */
     public function addBankVerifiy(FrontendApiMainController $contll, array $inputDatas)
     {
-        $userIdNum = $this->model::where([['user_id', $contll->partnerUser->id],['status', 1]])->count();
-        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']], ['user_id', $contll->partnerUser->id],['status', 1]])->count();
+        $userIdNum = $this->model::where([['user_id', $contll->partnerUser->id],['status', $this->model::INITIALIZATION_STATUS]])->count();
+        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']], ['user_id', $contll->partnerUser->id],['status', $this->model::INITIALIZATION_STATUS]])->count();
         //检验当前用户资金密码是否设置
         $funPassword = $contll->partnerUser->fund_password;
         if (!isset($funPassword)) {
