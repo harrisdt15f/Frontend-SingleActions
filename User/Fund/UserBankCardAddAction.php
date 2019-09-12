@@ -99,14 +99,14 @@ class UserBankCardAddAction
      */
     public function addBankVerifiy(FrontendApiMainController $contll, array $inputDatas)
     {
-        $userIdNum = $this->model::where('user_id', $contll->partnerUser->id)->count();
-        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']], ['user_id', $contll->partnerUser->id]])->count();
+        $userIdNum = $this->model::where([['user_id', $contll->partnerUser->id],['status', $this->model::INITIALIZATION_STATUS]])->count();
+        $ownerNameNum = $this->model::where([['owner_name', $inputDatas['owner_name']], ['user_id', $contll->partnerUser->id],['status', $this->model::INITIALIZATION_STATUS]])->count();
         //检验当前用户资金密码是否设置
         $funPassword = $contll->partnerUser->fund_password;
         if (!isset($funPassword)) {
             return $contll->msgOut(false, [], '100205');
         }
-        //检验当前银行卡状态
+        //检验当前银行状态
         $systemBankEloq = FrontendSystemBank::where('title',$inputDatas['bank_name'])->first();
         if ($systemBankEloq !== null) {
             if (!$systemBankEloq->status) {
@@ -115,6 +115,9 @@ class UserBankCardAddAction
         }
         //检验当用户银行卡是否第二次添加
         if ($userIdNum >= 1) {
+            if (empty($inputDatas['fund_password'])) {
+                return $contll->msgOut(false, [], '100211');
+            }
             if (!Hash::check($inputDatas['fund_password'], $contll->partnerUser->fund_password)) {
                 return $contll->msgOut(false, [], '100206');
             }
