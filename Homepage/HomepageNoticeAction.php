@@ -25,16 +25,16 @@ class HomepageNoticeAction
      * @param FrontendApiMainController $contll
      * @return JsonResponse
      */
-    public function execute(FrontendApiMainController $contll): JsonResponse
+    public function execute(FrontendApiMainController $contll, $inputDatas): JsonResponse
     {
         $noticeEloq = $this->model::select('show_num', 'status')->where('en_name', 'notice')->first();
         if ($noticeEloq->status !== 1) {
             return $contll->msgOut(false, [], '100400');
         }
         $data = [];
-        if ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
+        if ((int) $inputDatas['type'] === FrontendMessageNoticesContent::TYPE_NOTICE) {
             $data = $this->getNoticeList($contll);
-        } elseif ((int)$contll->inputs['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
+        } elseif ((int) $inputDatas['type'] === FrontendMessageNoticesContent::TYPE_MESSAGE) {
             $data = $this->getMessageList($contll);
         }
         return $contll->msgOut(true, $data);
